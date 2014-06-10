@@ -1,4 +1,5 @@
-from math import cos, sin, acos, pi
+from math import cos, sin, acos, atan, pi
+import math
 
 def heading_error(initial, final):
     assert initial <= 360
@@ -42,3 +43,40 @@ def distance(a, b):
      t3 = sin(lat_a) * sin(lat_b)
      tt = acos(t1 + t2 + t3)
      return 6366000 * tt
+
+def heading(a, b):
+    a_lat, a_lon = a
+    b_lat, b_lon = b
+    lat1 = math.radians(a_lat)
+    lat2 = math.radians(b_lat)
+    lon_diff = math.radians(b_lon - a_lon)
+    y = sin(lon_diff) * cos(lat2)
+    x = cos(lat1) * sin(lat2) - sin(lat1)
+    cos(lat2) * cos(lon_diff)
+    return (math.degrees(atan2(y, x)) + 360) % 360
+
+def move_sail(wind_angle):
+    if wind_angle < 180:
+        if wind_angle < 70:
+            position = 0
+        elif wind_angle < 80:
+            position = 18
+        elif wind_angle < 90:
+            position = 36
+        elif wind_angle < 110:
+            position = 54
+        else:
+            position = 72
+    else:
+        if wind_angle >= 290:
+            position = 0
+        elif wind_angle >= 280:
+            position = 18
+        elif wind_angle >= 270:
+            position = 36
+        elif wind_angle >= 250:
+            position = 54
+        else:
+            position = 72;
+
+    return position
