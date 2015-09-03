@@ -27,7 +27,7 @@ def get_rudder_position(heading, wanted_heading):
     print('error:', error, 'integrator:', integrator)
     boat.rudder( -(K_P * error + K_I * integrator))
 
-def get_absolute_wind_direction()
+def get_absolute_wind_direction():
     return 10
 
 waypoints = [(-12, 3443), (2, 334)]
@@ -51,7 +51,7 @@ for point in waypoints:
             rudder_position = 180 + adjustment
         else:
             if not is_tacking:
-                angle = boat_utils.heading_difference(absolute_wind_direction - how_close_to_wind, desired_heading
+                angle = boat_utils.heading_difference((absolute_wind_direction - how_close_to_wind), desired_heading)
                 angle = abs(angle)
                 dist_on_left = tack_distance * math.cos(math.radians(angle))
                 dist_on_right = tack_distance * math.sin(math.radians(angle))
