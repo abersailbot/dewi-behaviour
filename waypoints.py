@@ -73,7 +73,7 @@ for point in waypoints:
 
                 tackingSet = true;
             
-            current_distance = math_utils.distance((start_lat, start_long), (boat.latitude, boat.longitude))
+            current_distance = boat_utils.distance((start_lat, start_long), (boat.latitude, boat.longitude))
             
             if current_side == 'R':
                 target_distance = dist_on_right - current_distance
