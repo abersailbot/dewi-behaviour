@@ -97,7 +97,7 @@ for point in waypoints:
     while boat_utils.distance(boat.position, point) > waypoint_error:
         rudder_position = 0
         absolute_wind_direction = get_absolute_wind_direction()
-        desired_heading = boat_utils.heading(boat.postition, point)
+        desired_heading = boat_utils.heading(boat.position, point)
 
         print('position:', boat.position,
             'distance to waypoint:', boat_utils.distance(boat.position, point),
