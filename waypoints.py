@@ -15,6 +15,10 @@ current_side = 'R'
 start = (0, 0)
 fake_wind_direction = 10
 
+
+dist_on_left = 0
+dist_on_right = 0
+
 HEADING = 0
 K_P = 1
 K_I = 0.1
@@ -90,8 +94,6 @@ def calculate_tack():
 
 
 for point in waypoints:
-    dist_on_left = 0
-    dist_on_right = 0
     while boat_utils.distance(boat.position, point) > waypoint_error:
         rudder_position = 0
         absolute_wind_direction = get_absolute_wind_direction()
