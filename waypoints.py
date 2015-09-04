@@ -72,8 +72,8 @@ for point in waypoints:
                     # If left side is favourable
                     current_side = 'L'
                     target_heading = absoulte_wind_direction - how_close
-                    if (targetHeading < 0):
-                        targetHeading = 360 + target_heading
+                    if (target_heading < 0):
+                        target_heading = 360 + target_heading
                 start_lat = boat.latitude
                 start_long = boat.longitude
 
