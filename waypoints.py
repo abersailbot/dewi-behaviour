@@ -3,6 +3,10 @@ import time
 import boat_utils
 from boatd_client import Boat
 
+
+waypoints = [(60.1050, 19.9500), (60.1050, 19.9560), (60.1080, 19.9560), (60.1080, 19.9500), (60.1050, 19.9500), (60.105461, 19.946920)]
+
+
 waypoint_error = 10
 how_close_to_wind = 45
 is_tacking = False
@@ -84,7 +88,6 @@ def calculate_tack():
             target_heading = 360 + target_heading
     return target_heading
 
-waypoints = [(-12, 3443), (2, 334)]
 
 for point in waypoints:
     dist_on_left = 0
