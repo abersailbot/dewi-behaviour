@@ -9,6 +9,7 @@ is_tacking = False
 tack_distance = 20
 current_side = 'R'
 start = (0, 0)
+fake_wind_direction = 10
 
 HEADING = 0
 K_P = 1
@@ -27,7 +28,7 @@ def get_rudder_position(heading, wanted_heading):
     boat.rudder( -(K_P * error + K_I * integrator))
 
 def get_absolute_wind_direction():
-    return 10
+    return fake_wind_direction
 
 def calculate_tack():
     if not is_tacking:
