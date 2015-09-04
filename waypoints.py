@@ -48,13 +48,21 @@ for point in waypoints:
             is_tacking = False
             targetHeading = desired_heading
         else:
+            calculate_tack()
             if not is_tacking:
                 angle = boat_utils.heading_difference(boat_utils.heading_difference(absolute_wind_direction, how_close_to_wind), desired_heading)
                 angle = abs(angle)
                 dist_on_left = tack_distance * math.cos(math.radians(angle))
                 dist_on_right = tack_distance * math.sin(math.radians(angle))
+                
                 # Checking which side is favourable, i.e. closer to the desired heading
-                if boat_utils.heading_difference(desired_heading, (absolute_wind_direction + how_close)) < boat_utils.heading_difference(desiredHeading, (absolute_wind_direciton - howClose)):
+                left_temp = absolute_wind_direction + how_close
+                if left_temp > 360:
+                    left_temp -= 360
+                right_temp = absolute_wind_direction - how_close
+                if right_temp < 0:
+                    right_temp += 360
+                if boat_utils.heading_difference(desired_heading, left_temp) < boat_utils.heading_difference(desiredHeading, right_temp)
                     # If right side is favourable
                     current_side = 'R'
                     target_heading = absoulte_wind_direction + how_close
@@ -101,4 +109,4 @@ for point in waypoints:
         rudder_position = 180 + adjustment
  
         boat.rudder(rudder_position)
-        boat.sail(boat_utils.move_sail(boat.wind - boat.heading))
+        boat.sail(boat_utils.move_sail(boat_utils.heading_distance(boat.wind - boat.heading)))
