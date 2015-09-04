@@ -62,7 +62,7 @@ for point in waypoints:
                 right_temp = absolute_wind_direction - how_close
                 if right_temp < 0:
                     right_temp += 360
-                if boat_utils.heading_difference(desired_heading, left_temp) < boat_utils.heading_difference(desiredHeading, right_temp)
+                if boat_utils.heading_difference(desired_heading, left_temp) < boat_utils.heading_difference(desiredHeading, right_temp):
                     # If right side is favourable
                     current_side = 'R'
                     target_heading = absoulte_wind_direction + how_close
