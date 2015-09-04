@@ -6,7 +6,7 @@ from boatd_client import Boat
 
 
 #waypoints = [(60.1050, 19.9500), (60.1050, 19.9560), (60.1080, 19.9560), (60.1080, 19.9500), (60.1050, 19.9500), (60.105461, 19.946920)]
-#waypoints = [(60.106065, 19.947596), (60.105589, 19.948669), (60.105536, 19.947103)]
+waypoints = [(60.106065, 19.947596), (60.105589, 19.948669), (60.105536, 19.947103)]
 
 waypoint_error = 10
 how_close_to_wind = 45
@@ -14,14 +14,14 @@ is_tacking = False
 tack_distance = 20
 current_side = 'R'
 start = (0, 0)
-fake_wind_direction = 220
+fake_wind_direction = 200
 
 
 dist_on_left = 0
 dist_on_right = 0
 
-K_P = 2
-K_I = 0.1
+K_P = 1.25
+K_I = 0.009
 
 integrator = 0
 integrator_max = 1000
@@ -93,14 +93,14 @@ def calculate_tack(desired_heading, target_heading, absolute_wind_direction):
     if current_side == 'L' and current_distance > dist_on_left:
         # Switching to right side
         current_side = 'R'
-        start = (boat.latitude, boat.longitude)
+        start = boat.position
         target_heading = absolute_wind_direction + how_close_to_wind
         if target_heading > 360:
             target_heading -= 360
     elif current_side == 'R' and current_distance > dist_on_right:
         # Switching to left side
         current_side = 'L'
-        start = (boat.latitude, boat.longitude)
+        start = boat.position
         target_heading = absolute_wind_direction - how_close_to_wind
         if target_heading < 0:
             target_heading = 360 + target_heading
@@ -116,26 +116,16 @@ for point in waypoints:
         desired_heading = boat_utils.heading(boat.position, point)
 	target_heading = 0
     
-        print('position:', boat.position,
-	    'waypoint:',point,
-            'distance to waypoint:', boat_utils.distance(boat.position, point),
-            'desired_heading:', desired_heading)
-
-	print("wind and desired_heading difference = ",boat_utils.heading_difference(desired_heading, absolute_wind_direction))
         if abs(boat_utils.heading_difference(desired_heading, absolute_wind_direction)) > how_close_to_wind:
             is_tacking = False
             target_heading = desired_heading
-	    print('target_heading in if statement',target_heading)
+	    #print('target_heading in if statement',target_heading)
         else:
 	    is_tacking = False
 	    print("calculating tacking")
-            target_heading = calculate_tack(desired_heading, target_heading, absolute_wind_direction)
-            
+            #target_heading = calculate_tack(desired_heading, target_heading, absolute_wind_direction)
 
-	print('is_tacking: ')
-	print(is_tacking)
 
-	print("target_heading = ",target_heading)
         # Actually adjusting the rudder
         get_rudder_position(boat.heading, target_heading)
  
@@ -146,8 +136,16 @@ for point in waypoints:
 	if relative_wind < 0:
 	    relative_wind = relative_wind + 360 
 
-	print("relative wind =",relative_wind)
+        print('position:', boat.position,
+            'waypoint:',point,
+            'distance to waypoint:', boat_utils.distance(boat.position, point),
+            'desired_heading:', desired_heading,
+            'target_heading:', target_heading,
+            'is_tacking:', is_tacking,
+            'relative_wind:', relative_wind)
 
-        boat.sail(boat_utils.move_sail(relative_wind))
+ 
+
+	boat.sail(boat_utils.move_sail(relative_wind))
 	print("")
 
