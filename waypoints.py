@@ -7,9 +7,8 @@ waypoint_error = 10
 how_close_to_wind = 45
 is_tacking = False
 tack_distance = 20
-currentSide = 'R'
-start_lat = 0
-start_lon = 0
+current_side = 'R'
+start = (0, 0)
 
 HEADING = 0
 K_P = 1
@@ -30,6 +29,60 @@ def get_rudder_position(heading, wanted_heading):
 def get_absolute_wind_direction():
     return 10
 
+def calculate_tack():
+    if not is_tacking:
+        angle = boat_utils.heading_difference(boat_utils.heading_difference(absolute_wind_direction, how_close_to_wind), desired_heading)
+        angle = abs(angle)
+        dist_on_left = tack_distance * math.cos(math.radians(angle))
+        dist_on_right = tack_distance * math.sin(math.radians(angle))
+        
+        # Checking which side is favourable, i.e. closer to the desired heading
+        left_temp = absolute_wind_direction + how_close
+        if left_temp > 360:
+            left_temp -= 360
+        right_temp = absolute_wind_direction - how_close
+        if right_temp < 0:
+            right_temp += 360
+        if boat_utils.heading_difference(desired_heading, left_temp) < boat_utils.heading_difference(desiredHeading, right_temp):
+            # If right side is favourable
+            current_side = 'R'
+            target_heading = absoulte_wind_direction + how_close
+            if (target_heading > 360):
+                target_heading -= 360
+        else:
+            # If left side is favourable
+            current_side = 'L'
+            target_heading = absoulte_wind_direction - how_close
+            if (target_heading < 0):
+                target_heading = 360 + target_heading
+        start = (boat.latitude, boat.longitude)
+
+        tackingSet = true;
+    
+    current_distance = boat_utils.distance(start, boat.position)
+    
+    if current_side == 'R':
+        target_distance = dist_on_right - current_distance
+    else:
+        target_distance = dist_on_left - current_distance
+
+    # Checking if side should be changed
+    if current_side == 'L' and current_distance > dist_on_left:
+        # Switching to right side
+        current_side = 'R'
+        start = (boat.latitude, boat.longitude)
+        target_heading = absolute_wind_direction + how_close
+        if target_heading > 360:
+            target_heading -= 360
+    elif current_side == 'R' and current_distance > dist_on_right:
+        # Switching to left side
+        current_side = 'L'
+        start = (boat.latitude, boat.longitude)
+        target_heading = absolute_wind_direction - how_close
+        if target_heading < 0:
+            target_heading = 360 + target_heading
+    return target_heading
+
 waypoints = [(-12, 3443), (2, 334)]
 
 for point in waypoints:
@@ -46,63 +99,10 @@ for point in waypoints:
 
         if boat_utils.heading_difference(desired_heading, absolute_wind_direction) > how_close_to_wind:
             is_tacking = False
-            targetHeading = desired_heading
+            target_heading = desired_heading
         else:
-            calculate_tack()
-            if not is_tacking:
-                angle = boat_utils.heading_difference(boat_utils.heading_difference(absolute_wind_direction, how_close_to_wind), desired_heading)
-                angle = abs(angle)
-                dist_on_left = tack_distance * math.cos(math.radians(angle))
-                dist_on_right = tack_distance * math.sin(math.radians(angle))
-                
-                # Checking which side is favourable, i.e. closer to the desired heading
-                left_temp = absolute_wind_direction + how_close
-                if left_temp > 360:
-                    left_temp -= 360
-                right_temp = absolute_wind_direction - how_close
-                if right_temp < 0:
-                    right_temp += 360
-                if boat_utils.heading_difference(desired_heading, left_temp) < boat_utils.heading_difference(desiredHeading, right_temp):
-                    # If right side is favourable
-                    current_side = 'R'
-                    target_heading = absoulte_wind_direction + how_close
-                    if (target_heading > 360):
-                        target_heading -= 360
-                else:
-                    # If left side is favourable
-                    current_side = 'L'
-                    target_heading = absoulte_wind_direction - how_close
-                    if (target_heading < 0):
-                        target_heading = 360 + target_heading
-                start_lat = boat.latitude
-                start_long = boat.longitude
-
-                tackingSet = true;
+            target_heading = calculate_tack()
             
-            current_distance = boat_utils.distance((start_lat, start_long), (boat.latitude, boat.longitude))
-            
-            if current_side == 'R':
-                target_distance = dist_on_right - current_distance
-            else:
-                target_distance = dist_on_left - current_distance
- 
-            # Checking if side should be changed
-            if current_side == 'L' and current_distance > dist_on_left:
-                # Switching to right side
-                current_side = 'R'
-                start_lat = boat.latitude
-                start_lon = boat.longitude
-                target_heading = absolute_wind_direction + how_close
-                if target_heading > 360:
-                    target_heading -= 360
-            elif current_side == 'R' and current_distance > dist_on_right:
-                # Switching to left side
-                current_side = 'L'
-                start_lat = boat.latitude
-                start_lon = boat.longitude
-                target_heading = absolute_wind_direction - how_close
-                if target_heading < 0:
-                    target_heading = 360 + target_heading
 
         # Actually adjusting the rudder
         adjustment = get_rudder_position(boat.heading, desired_heading)
