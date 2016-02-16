@@ -15,3 +15,9 @@ home_waypoint = (52.406988,-4.090990)
 laps = 1
 
 dewi = Boat()
+
+# Function to sail to each waypoint (calling functions to navigate to each)
+def sail():
+	# Loop for all waypoint tuples in the waypoints array
+	for waypoint_count in waypoints:
+		
