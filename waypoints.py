@@ -14,6 +14,9 @@ home_waypoint = (52.406988,-4.090990)
 # The number of laps of the course to complete before returning home
 laps = 1
 
+# The GPS Error in Metres
+gps_error = 10
+
 dewi = Boat()
 
 # Function to sail to each waypoint (calling functions to navigate to each)
@@ -31,7 +34,7 @@ def navigate(waypoint):
 	waypoint_reached = false
 	# Repeat while the waypoint has not been reached
 	while waypoint_reached == false :
-		# Check whether the waypoint has been reached and whether we should move on to the 			next waypoint
+		# Check whether the waypoint has been reached and whether we should move on to the next waypoint
 		waypoint_reached = check_waypoint_reached(waypoint);
 		
 def check_waypoint_reached(waypoint):
