@@ -26,7 +26,7 @@ def sail():
 	navigate(home_waypoint)
 	
 # Function to navigate to the next waypoint
-def navigate(waypoint)
+def navigate(waypoint):
 	# Variable to hold the boolean value of whether the waypoint has been reached or not
 	waypoint_reached = false
 	# Repeat while the waypoint has not been reached
@@ -35,8 +35,8 @@ def navigate(waypoint)
 		waypoint_reached = check_waypoint_reached(waypoint);
 		
 def check_waypoint_reached(waypoint):
-	# Check proximity to the waypoint to decide if it has been reached
+	# Check proximity to the waypoint to decide if it has been reached - we can change the specification of this e.g. if we need to navigate around buoys when needed
 	if boat_utils.distance(dewi.position, waypoint) > gps_error:
 		return true
-	else
+	else:
 		return false
