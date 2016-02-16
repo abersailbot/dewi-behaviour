@@ -19,5 +19,11 @@ dewi = Boat()
 # Function to sail to each waypoint (calling functions to navigate to each)
 def sail():
 	# Loop for all waypoint tuples in the waypoints array
-	for waypoint_count in waypoints:
-		
+	for waypoint in waypoints:
+		# Navigate to the next waypoint
+		navigate(waypoint)
+	# Once all the waypoints have been visited, the boat sails back to the home waypoint
+	navigate(home_waypoint)
+	
+def navigate(waypoint)
+	
