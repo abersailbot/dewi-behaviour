@@ -1,4 +1,4 @@
-# Dewi - Waypoint Navigation - Aber SailBot
+# Dewi - Waypoint Navigation - AberSailbot
 # =========================================
 
 import math
