@@ -36,10 +36,11 @@ def navigate(waypoint):
 	while waypoint_reached == false :
 		# Check whether the waypoint has been reached and whether we should move on to the next waypoint
 		waypoint_reached = check_waypoint_reached(waypoint);
-		
+
+# Function to check whether the waypoint has been reached yet
 def check_waypoint_reached(waypoint):
 	# Check proximity to the waypoint to decide if it has been reached - we can change the specification of this e.g. if we need to navigate around buoys when needed
-	if boat_utils.distance(dewi.position, waypoint) > gps_error:
-		return true
-	else:
-		return false
+    if boat_utils.distance(dewi.position, waypoint) > gps_error:
+        return true
+    else:
+        return false
