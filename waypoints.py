@@ -3,7 +3,7 @@
 
 import math
 import boat_utils
-from boatd_client import Boat
+from boatdclient import Boat
 
 # All the waypoints can be added to this list of tuples
 waypoints = [(52.406988,-4.090990)] 

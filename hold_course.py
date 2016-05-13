@@ -1,6 +1,6 @@
 import time
 import boat_utils
-from boatd_client import Boat
+from boatdclient import Boat
 
 HEADING = 200
 K_P = 1
