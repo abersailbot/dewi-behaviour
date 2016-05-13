@@ -73,3 +73,4 @@ def check_boat_waypoint_angle(waypoint):
         return false # Do not need to beat
     else:
         return true # Do need to beat
+
