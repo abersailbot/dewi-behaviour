@@ -59,7 +59,7 @@ def sail_straight:
 # Function to check whether the waypoint has been reached yet
 def check_waypoint_reached(waypoint):
 	# Check proximity to the waypoint to decide if it has been reached - we can change the specification of this e.g. if we need to navigate around buoys when needed
-    if boat_utils.distance(dewi.position, waypoint) > gps_error:
+    if boat_utils.distance(dewi.position, waypoint) < gps_error:
         return true
     else:
         return false
