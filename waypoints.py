@@ -34,12 +34,10 @@ def sail():
 # Function to navigate to the next waypoint
 def navigate(waypoint):
 	# Variable to hold the boolean value of whether the waypoint has been reached or not
-	waypoint_reached = false
+	waypoint_reached = check_waypoint_reached(waypoint)
 
 	# Repeat while the waypoint has not been reached
 	while waypoint_reached == false :
-		# Check whether the waypoint has been reached and whether we should move on to the next waypoint
-		waypoint_reached = check_waypoint_reached(waypoint)
         # Check angle between the wind direction, boat location, and the waypoint - does it require beating
         beat_required = check_boat_waypoint_angle(waypoint)
 
@@ -49,6 +47,9 @@ def navigate(waypoint):
         else
             sail_straight # Next waypoint will be sailed to in a straight line
 
+        # Check whether the waypoint has been reached and whether we should move on to the next waypoint
+        waypoint_reached = check_waypoint_reached(waypoint)
+    
 # Function to beat upwind to the next waypoint
 def sail_beat:
 
@@ -58,7 +59,7 @@ def sail_straight:
 # Function to check whether the waypoint has been reached yet
 def check_waypoint_reached(waypoint):
 	# Check proximity to the waypoint to decide if it has been reached - we can change the specification of this e.g. if we need to navigate around buoys when needed
-    if boat_utils.distance(dewi.position, waypoint) > gps_error:
+    if boat_utils.distance(dewi.position, waypoint) < gps_error:
         return true
     else:
         return false
@@ -72,3 +73,4 @@ def check_boat_waypoint_angle(waypoint):
         return false # Do not need to beat
     else:
         return true # Do need to beat
+
