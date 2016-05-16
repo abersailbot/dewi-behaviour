@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Dewi - Waypoint Navigation - AberSailbot
 # =========================================
 
