@@ -52,11 +52,8 @@ def navigate(waypoint):
         # Check whether the waypoint has been reached and whether we should move on to the next waypoint
         waypoint_reached = check_waypoint_reached(waypoint)
     
-# Function to beat upwind to the next waypoint
-def sail_beat:
-
-# Function to sail in a straight line to the next waypoint
-def sail_straight:
+# Function to sail towards next waypoint
+def sail_to_waypoint(waypoint)
 
 # Function to check whether the waypoint has been reached yet
 def check_waypoint_reached(waypoint):
