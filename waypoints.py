@@ -40,14 +40,9 @@ def navigate(waypoint):
 
 	# Repeat while the waypoint has not been reached
 	while waypoint_reached == false :
-        # Check angle between the wind direction, boat location, and the waypoint - does it require beating
-        beat_required = check_boat_waypoint_angle(waypoint)
 
-        # Check how we will sail to the next waypoint
-        if beat_required:
-            sail_beat # Beat to the next waypoint
-        else
-            sail_straight # Next waypoint will be sailed to in a straight line
+        # Sail to the next waypoint
+        sail_to_waypoint(waypoint)
 
         # Check whether the waypoint has been reached and whether we should move on to the next waypoint
         waypoint_reached = check_waypoint_reached(waypoint)
@@ -62,14 +57,3 @@ def check_waypoint_reached(waypoint):
         return true
     else:
         return false
-
-def check_boat_waypoint_angle(waypoint):
-    # Find bearing of boat to next waypoint
-    bearing = boat_utils.heading(ACTUALBOATWAYPOINT, waypoint)
-    # Calculate difference between bearing to waypoint and wind angle
-    angle_between = boat_utils.heading_difference(ACTUALWINDANGLE, bearing)
-    if angle_between > 45:
-        return false # Do not need to beat
-    else:
-        return true # Do need to beat
-
