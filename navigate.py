@@ -1,7 +1,11 @@
+from abc import ABCMeta, abstractmethod
+
 import boatdclient
 
 
 class Navigator(object):
+    __metaclass__ = ABCMeta
+
     def __init__(self):
         self.boat = boatdclient.Boat(convenience=True)
 
