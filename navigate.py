@@ -12,14 +12,15 @@ class Navigator(object):
 
         self.target = None
 
-        self.k_p = 0.3
-        self.k_i = 0.005
+        self.k_p = 0.6
+        self.k_i = 0.003
         self.integrator = 0
-        self.integrator_max = 180
+        self.integrator_max = 10000
 
     def set_target(self, value):
         '''Set the target angle for the boat.'''
         self.target = value
+        self.integrator = 0
 
     def update(self):
         '''Update actuators to make progress towards targets.'''
@@ -31,6 +32,8 @@ class Navigator(object):
 
         error = current_heading.delta(target_heading)
         self.integrator += error
+        if self.integrator > self.integrator_max:
+            self.integrator = self.integrator_max
 
         print('heading:', current_heading, '	wanted:', target_heading, '	error:',
               error, '	integrator:', self.integrator, '	target:', self.target)
@@ -43,7 +46,7 @@ class Navigator(object):
                 self.set_target(target)
 
             self.update()
-            time.sleep(1)
+            time.sleep(0.1)
 
     @abstractmethod
     def check_new_target(self):
