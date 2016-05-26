@@ -5,6 +5,13 @@ import boatdclient
 
 
 class Navigator(object):
+    '''
+    Abstract class used to implement behaviours. 
+
+    This should be inherited from and ``check_new_target`` defined to create a
+    behaviour with some targets. See ``demo-waypoint-behaviour`` for an example
+    of basic waypoint targeting.
+    '''
     __metaclass__ = ABCMeta
 
     def __init__(self):
@@ -23,7 +30,7 @@ class Navigator(object):
         self.integrator = 0
 
     def update(self):
-        '''Update actuators to make progress towards targets.'''
+        '''Update actuators to make progress towards target.'''
         current_heading = self.boat.heading
         if isinstance(self.target, boatdclient.Point):
             target_heading = self.boat.position.bearing_to(self.target)
@@ -40,6 +47,9 @@ class Navigator(object):
         self.boat.set_rudder( -(self.k_p * error + self.k_i * self.integrator))
 
     def run(self):
+        '''
+        Run the main loop for the behaviour.
+        '''
         while True:
             target = self.check_new_target()
             if target is not None:
@@ -53,6 +63,7 @@ class Navigator(object):
         '''
         Check if a new target point needs to be selected.
 
-        Return a new ``Point`` if target will be changed, None otherwise.
+        Return a new ``Point`` or ``Bearing` if target will be changed,
+        ``None`` otherwise.
         '''
         pass
