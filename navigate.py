@@ -37,6 +37,20 @@ class Navigator(object):
         else:
             target_heading = self.target
 
+#Tacking logic
+	if target_heading < self.boat.wind_direction + 45 and target_heading > self.boat.wind_direction - 45:
+	    if self.boat.position.bearing_to(self.target) > 10:
+	        target_heading = self.boat.wind_direction + 45
+	    elif self.boat.position.bearing_to(self.target) < 10:
+	        target_heading = self.boat.wind_direction - 45
+	    elif current_heading < self.boat.wind_direction:
+                target_heading = self.boat.wind_direction - 45
+
+            else:
+		target_heading = self.boat.wind_direction + 45
+
+
+
         error = current_heading.delta(target_heading)
         self.integrator += error
         if self.integrator > self.integrator_max:
