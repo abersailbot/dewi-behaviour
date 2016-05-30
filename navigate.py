@@ -40,10 +40,10 @@ class Navigator(object):
         # tacking logic
         if target_heading < self.boat.wind.direction + Bearing(45) and target_heading > self.boat.wind_direction - Bearing(45):
 
-            if self.boat.position.bearing_to(self.target) > 10:
+            if self.boat.position.bearing_to(self.target) > 5:
                 target_heading = self.boat.wind.direction + Bearing(45)
 
-            elif self.boat.position.bearing_to(self.target) < 10:
+            elif self.boat.position.bearing_to(self.target) < 5:
                 target_heading = self.boat.wind.direction - Bearing(45)
 
             elif current_heading > self.boat.wind.direction + Bearing(180):
