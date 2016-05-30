@@ -46,7 +46,7 @@ class Navigator(object):
             elif self.boat.position.bearing_to(self.target) < 10:
                 target_heading = self.boat.wind.direction - Bearing(45)
 
-            elif current_heading < self.boat.wind.direction:
+            elif current_heading > self.boat.wind.direction + Bearing(180):
                 target_heading = self.boat.wind.direction - Bearing(45)
 
             else:
