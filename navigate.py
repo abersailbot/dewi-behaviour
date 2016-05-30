@@ -38,19 +38,19 @@ class Navigator(object):
             target_heading = self.target
 
 #Tacking logic
-	if target_heading < self.boat.wind.direction + Bearing(45) and target_heading > self.boat.wind.direction - Bearing(45):
+        if target_heading < self.boat.wind.direction + Bearing(45) and target_heading > self.boat.wind.direction - Bearing(45):
 
-	    if self.boat.position.bearing_to(self.target) > 10:
-	        target_heading = self.boat.wind.direction + Bearing(45)
+            if self.boat.position.bearing_to(self.target) > 10:
+                target_heading = self.boat.wind.direction + Bearing(45)
 
-	    elif self.boat.position.bearing_to(self.target) < 10:
-	        target_heading = self.boat.wind.direction - Bearing(45)
+            elif self.boat.position.bearing_to(self.target) < 10:
+                target_heading = self.boat.wind.direction - Bearing(45)
 
-	    elif current_heading < self.boat.wind.direction:
+            elif current_heading < self.boat.wind.direction:
                 target_heading = self.boat.wind.direction - Bearing(45)
 
             else:
-		target_heading = self.boat.wind.direction + Bearing(45)
+                target_heading = self.boat.wind.direction + Bearing(45)
 
 
 
