@@ -62,6 +62,34 @@ class Navigator(object):
         print('heading:', current_heading, '	wanted:', target_heading, '	error:',
               error, '	integrator:', self.integrator, '	target:', self.target)
         self.boat.set_rudder( -(self.k_p * error + self.k_i * self.integrator))
+	self.update_sail()
+
+    def update_sail(self):
+	'''Set the sail to the correct angle based on current wind direction'''
+	if self.boat.wind_direction < 180:
+			if self.boat.wind_direction < 70:
+				newSailAngle = 0
+			elif self.boat.wind_direction < 80:
+				newSailAngle = 18
+			elif self.boat.wind_direction < 90:
+				newSailAngle = 36
+			elif self.boat.wind_direction < 110:
+				newSailAngle = 54
+			else:
+				newSailAngle = 72
+		else:
+			if self.boat.wind_direction >= 290:
+				newSailAngle = 0
+			elif self.boat.wind_direction >= 280:
+				newSailAngle = 342
+			elif self.boat.wind_direction >= 270:
+				newSailAngle = 324
+			elif self.boat.wind_direction >= 250:
+				newSailAngle = 306
+			else:
+				newSailAngle = 288
+				
+		self.boat.set_sail(newSailAngle)
 
     def run(self):
         '''
