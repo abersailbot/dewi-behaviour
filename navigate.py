@@ -67,7 +67,7 @@ class Navigator(object):
     def update_sail(self):
 	'''Set the sail to the correct angle based on current wind direction'''
 
-	relative_wind_direction = self.boat.wind_direction - Bearing(self.boat.heading)
+	relative_wind_direction = self.boat.wind_direction - self.boat.heading
 	if relative_wind_direction < 180:
 			if relative_wind_direction < 70:
 				newSailAngle = 0
