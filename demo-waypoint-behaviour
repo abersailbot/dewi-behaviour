@@ -4,7 +4,7 @@ import boatdclient
 
 from navigate import Navigator
 
-points = None
+points = boatdclient.get_current_waypoints()
 
 
 class TestBehaviour(Navigator):
