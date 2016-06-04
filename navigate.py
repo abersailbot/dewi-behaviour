@@ -15,7 +15,7 @@ class Navigator(object):
     __metaclass__ = ABCMeta
 
     def __init__(self):
-        self.boat = boatdclient.Boat(convenience=True)
+        self.boat = boatdclient.Boat()
 
         self.target = None
 
