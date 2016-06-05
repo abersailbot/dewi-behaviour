@@ -52,7 +52,7 @@ class Navigator(object):
 
             cone_angle = 15
 
-            bearing_to_wind = self.boat.position.bearing_to(self.target) + self.boat.wind.direction
+            bearing_to_wind = self.boat.position.bearing_to(self.target) - self.boat.wind.direction
             print 'I am tacking and bearing_to_wind is', bearing_to_wind
             if self.boat.relative_wind > 180:
                 pass
