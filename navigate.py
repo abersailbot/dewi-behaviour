@@ -49,13 +49,13 @@ class Navigator(object):
             cone_angle = 15
             if self.boat.wind.relative_direction > 180:
 
-            if self.boat.position.bearing_to(self.target) > 5 and self.boat.position.bearing_to(self.target) < 355:
+            if self.boat.position.bearing_to(self.target) > cone_angle and self.boat.position.bearing_to(self.target) < (360 - cone_angle):
                 if self.boat.position.bearing_to(self.target) < 180:
                     target_heading = self.boat.wind.direction + Bearing(45)              
 	        if self.boat.position.bearing_to(self.target) > 180:               
                     target_heading = self.boat.wind.direction - Bearing(45)
 
-            elif self.boat.position.bearing_to(self.target) < 5 and self.boat.position.bearing_to(self.target) > 355:
+            elif self.boat.position.bearing_to(self.target) < cone_angle and self.boat.position.bearing_to(self.target) > (360 - cone_angle):
                 if self.boat.position.bearing_to(self.target) < 180:      
                     target_heading = self.boat.wind.direction - Bearing(45)
                 if self.boat.position.bearing_to(self.target) > 180:
