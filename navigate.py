@@ -50,7 +50,7 @@ class Navigator(object):
             # FIXME: Wrap around at 180 deg instead of 360 - the logic needn't take into account what side of the wind it is on. Only, e.g. 45 degrees off the wind etc.
             
 
-            cone_angle = 15
+            cone_angle = Bearing(15)
 
             bearing_to_wind = self.boat.position.bearing_to(self.target) - self.boat.wind.direction
             print 'I am tacking and bearing_to_wind is', bearing_to_wind
