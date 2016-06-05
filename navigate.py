@@ -57,12 +57,14 @@ class Navigator(object):
             if self.boat.relative_wind > 180:
                 pass
 
+			# Detects of it is outside the cone
             if bearing_to_wind > cone_angle and bearing_to_wind < (360 - cone_angle):
                 if bearing_to_wind <= 180:
                     target_heading = self.boat.wind.direction - Bearing(45)
                 if bearing_to_wind > 180:
                     target_heading = self.boat.wind.direction + Bearing(45)
 
+			# Detects if it is inside cone
             elif bearing_to_wind < cone_angle and bearing_to_wind > (360 - cone_angle):
                 if bearing_to_wind <= 180:      
                     target_heading = self.boat.wind.direction - Bearing(45)
