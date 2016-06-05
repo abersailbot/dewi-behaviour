@@ -2,6 +2,7 @@ from abc import ABCMeta, abstractmethod
 import time
 
 import boatdclient
+from boatdclient import Bearing
 
 
 class Navigator(object):
@@ -42,7 +43,7 @@ class Navigator(object):
             target_heading = self.target
 
         # tacking logic
-        if target_heading < self.boat.wind.direction + Bearing(45) and target_heading > self.boat.wind_direction - Bearing(45):
+        if target_heading < self.boat.wind.direction + Bearing(45) and target_heading > self.boat.wind.direction - Bearing(45):
 
             # FIXME: make relative to wind angle
             
@@ -52,7 +53,8 @@ class Navigator(object):
             cone_angle = 15
 
             bearing_to_wind = self.boat.position.bearing_to(self.target) + self.boat.wind.direction
-            if self.boat.wind.relative_wind > 180:
+            print 'I am tacking and bearing_to_wind is', bearing_to_wind
+            if self.boat.relative_wind > 180:
                 pass
 
             if bearing_to_wind > cone_angle and bearing_to_wind < (360 - cone_angle):
