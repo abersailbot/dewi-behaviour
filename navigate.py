@@ -4,6 +4,11 @@ import time
 import boatdclient
 from boatdclient import Bearing
 
+def mirror_angle(angle):
+        if angle > 180:
+            return 180 - (angle % 180)
+        else: 
+            return angle
 
 class Navigator(object):
     '''
@@ -56,17 +61,19 @@ class Navigator(object):
             print 'I am tacking and bearing_to_wind is', bearing_to_wind
             if self.boat.relative_wind > 180:
                 pass
+             
+            # Just between 0 and 180 degrees, needed to reduce if statements as cone is reflected
+            modulus_to_wind = mirror_angle(bearing_to_wind)
 
 			# Detects if it is outside the cone
-            if bearing_to_wind > cone_angle and bearing_to_wind > (360 - cone_angle):
+            if modulus_to_wind > cone_angle:
                 if bearing_to_wind <= 180:
                     target_heading = self.boat.wind.direction - Bearing(45)
                 if bearing_to_wind > 180:
                     target_heading = self.boat.wind.direction + Bearing(45)
 
 			# Detects if it is inside cone
-            elif (bearing_to_wind < cone_angle and bearing_to_wind <= 180) and\
-                (bearing_to_wind < (360 - cone_angle) and bearing_to_wind > 180):
+            elif modulus_to_wind < cone_angle:
                 if bearing_to_wind <= 180:      
                     target_heading = self.boat.wind.direction + Bearing(45)
                 if bearing_to_wind > 180:
