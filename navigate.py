@@ -41,6 +41,9 @@ class Navigator(object):
         if target_heading < self.boat.wind.direction + Bearing(45) and target_heading > self.boat.wind_direction - Bearing(45):
 
             # FIXME: make relative to wind angle
+            
+            # FIXME: Wrap around at 180 deg instead of 360 - the logic needn't take into account what side of the wind it is on. Only, e.g. 45 degrees off the wind etc.
+            
             if self.boat.position.bearing_to(self.target) > 5:
                 target_heading = self.boat.wind.direction + Bearing(45)
 
