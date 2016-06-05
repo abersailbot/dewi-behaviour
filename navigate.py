@@ -50,8 +50,9 @@ class Navigator(object):
             
 
             cone_angle = 15
+
             bearing_to_wind = self.boat.position.bearing_to(self.target) + self.boat.wind.direction
-            if self.boat.wind.relative_direction > 180:
+            if self.boat.wind.relative_wind > 180:
                 pass
 
             if bearing_to_wind > cone_angle and bearing_to_wind < (360 - cone_angle):
