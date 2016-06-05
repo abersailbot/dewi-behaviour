@@ -46,17 +46,9 @@ class Navigator(object):
             
             # This always assumes that self.target will return a long/lat point
             
-            if self.boat.position.bearing_to(self.target) > 5:
-                target_heading = self.boat.wind.direction + Bearing(45)
-
-            elif self.boat.position.bearing_to(self.target) < 5:
-                target_heading = self.boat.wind.direction - Bearing(45)
-
-            elif current_heading > self.boat.wind.direction + Bearing(180):
-                target_heading = self.boat.wind.direction - Bearing(45)
-
-            else:
-                target_heading = self.boat.wind.direction + Bearing(45)
+        	cone_angle = 15
+        	
+        	if self.boat.wind.relative_direction > 180:
 
         error = current_heading.delta(target_heading)
         self.integrator += error
