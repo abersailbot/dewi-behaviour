@@ -76,14 +76,14 @@ class Navigator(object):
                 tacking = False
 
 
-               if bearing_to_wind <= 180:
+                if bearing_to_wind <= 180:
                     target_heading = self.boat.wind.direction - Bearing(45)
-                    self.tacking_right = False
-                    self.tacking_left = True
-                if bearing_to_wind > 180:
-                    target_heading = self.boat.wind.direction + Bearing(45)
                     self.tacking_right = True
                     self.tacking_left = False
+                if bearing_to_wind > 180:
+                    target_heading = self.boat.wind.direction + Bearing(45)
+                    self.tacking_right = False
+                    self.tacking_left = True
 
 			# Detects if it is inside cone
             elif modulus_to_wind < float(cone_angle):
