@@ -32,7 +32,6 @@ class Navigator(object):
         self.integrator_max = 10000
         self.tacking_left = True
         self.tacking_right = False
-        
 
     def set_target(self, value):
         '''Set the target angle for the boat.'''
@@ -50,26 +49,17 @@ class Navigator(object):
             target_heading = self.boat.position.bearing_to(self.target)
         else:
             target_heading = self.target
-        
-        
+
         # tacking logic
         if target_heading < self.boat.wind.direction + Bearing(45) and target_heading > self.boat.wind.direction - Bearing(45):
-            # FIXME: make relative to wind angle
-            
-            # FIXME: Wrap around at 180 deg instead of 360 - the logic needn't take into account what side of the wind it is on. Only, e.g. 45 degrees off the wind etc.
-            
-
             cone_angle = Bearing(15)
 
             bearing_to_wind = self.boat.position.bearing_to(self.target) - self.boat.wind.direction
-            print 'I am tacking and bearing_to_wind is', bearing_to_wind
-            if self.boat.relative_wind > 180:
-                pass
-             
-            # Just between 0 and 180 degrees, needed to reduce if statements as cone is reflected
+
+            # just between 0 and 180 degrees, needed to reduce if statements as cone is reflected
             modulus_to_wind = mirror_angle(bearing_to_wind)
 
-			# Detects if it is outside the cone
+            # detect if the boat is outside cone
             if modulus_to_wind >= float(cone_angle):
                 if bearing_to_wind <= 180:
                     target_heading = self.boat.wind.direction + Bearing(45)
@@ -80,19 +70,12 @@ class Navigator(object):
                     self.tacking_right = False
                     self.tacking_left = True
 
-			# Detects if it is inside cone
+            # detects if the boat is inside cone
             elif modulus_to_wind < float(cone_angle):
-
                 if self.tacking_left == True: 
                     target_heading = self.boat.wind.direction - Bearing(45)
                 if self.tacking_right == True:
                     target_heading = self.boat.wind.direction + Bearing(45)
- 
-                     
-            '''    if bearing_to_wind <= 180:      
-                    target_heading = self.boat.wind.direction + Bearing(45)
-                if bearing_to_wind > 180:
-                    target_heading = self.boat.wind.direction - Bearing(45)'''
         
         error = current_heading.delta(target_heading)
         self.integrator += error
