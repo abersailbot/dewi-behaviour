@@ -30,6 +30,7 @@ class Navigator(object):
         self.k_i = 0.003
         self.integrator = 0
         self.integrator_max = 10000
+        self.tacking = False
 
     def set_target(self, value):
         '''Set the target angle for the boat.'''
@@ -47,10 +48,11 @@ class Navigator(object):
             target_heading = self.boat.position.bearing_to(self.target)
         else:
             target_heading = self.target
-
+        
+        
         # tacking logic
-        if target_heading < self.boat.wind.direction + Bearing(45) and target_heading > self.boat.wind.direction - Bearing(45):
-
+        if (target_heading < self.boat.wind.direction + Bearing(45) and target_heading > self.boat.wind.direction - Bearing(45)) or tacking == True:
+            tacking = True
             # FIXME: make relative to wind angle
             
             # FIXME: Wrap around at 180 deg instead of 360 - the logic needn't take into account what side of the wind it is on. Only, e.g. 45 degrees off the wind etc.
@@ -68,6 +70,7 @@ class Navigator(object):
 
 			# Detects if it is outside the cone
             if modulus_to_wind > cone_angle:
+                tacking = False
                 if bearing_to_wind <= 180:
                     target_heading = self.boat.wind.direction - Bearing(45)
                 if bearing_to_wind > 180:
@@ -79,7 +82,7 @@ class Navigator(object):
                     target_heading = self.boat.wind.direction + Bearing(45)
                 if bearing_to_wind > 180:
                     target_heading = self.boat.wind.direction - Bearing(45)
-
+        
         error = current_heading.delta(target_heading)
         self.integrator += error
         if self.integrator > self.integrator_max:
