@@ -31,8 +31,8 @@ class Navigator(object):
         self.integrator = 0
         self.integrator_max = 10000
 
-        self.tacking_left = True
-        self.tacking_right = False
+        self.tacking_left = None
+        self.tacking_right = None
         self.cone_angle = Bearing(15)
 
     def set_target(self, value):
@@ -54,8 +54,17 @@ class Navigator(object):
 
         # tacking logic
         if target_heading < self.boat.wind.direction + Bearing(45) and target_heading > self.boat.wind.direction - Bearing(45):
-
             bearing_to_wind = self.boat.position.bearing_to(self.target) - self.boat.wind.direction
+
+            # choose the best initial tack, based on which side of the cone
+            # we're on
+            if self.tacking_right is None or self.tacking_left is None:
+                if bearing_to_wind <= 180:
+                    self.tacking_right = True
+                    self.tacking_left = False
+                else:
+                    self.tacking_right = False
+                    self.tacking_left = True
 
             # just between 0 and 180 degrees, needed to reduce if statements as cone is reflected
             modulus_to_wind = mirror_angle(bearing_to_wind)
@@ -77,6 +86,9 @@ class Navigator(object):
                     target_heading = self.boat.wind.direction - Bearing(45)
                 if self.tacking_right == True:
                     target_heading = self.boat.wind.direction + Bearing(45)
+        else:
+            self.tacking_left = None
+            self.tacking_right = None
         
         error = current_heading.delta(target_heading)
         self.integrator += error
