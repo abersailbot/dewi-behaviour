@@ -76,9 +76,9 @@ class Navigator(object):
 			# Detects if it is inside cone
             elif modulus_to_wind < cone_angle:
                 if bearing_to_wind <= 180:      
-                    target_heading = self.boat.wind.direction - Bearing(45)
-                if bearing_to_wind > 180:
                     target_heading = self.boat.wind.direction + Bearing(45)
+                if bearing_to_wind > 180:
+                    target_heading = self.boat.wind.direction - Bearing(45)
 
         error = current_heading.delta(target_heading)
         self.integrator += error
