@@ -30,8 +30,10 @@ class Navigator(object):
         self.k_i = 0.003
         self.integrator = 0
         self.integrator_max = 10000
+
         self.tacking_left = True
         self.tacking_right = False
+        self.cone_angle = Bearing(15)
 
     def set_target(self, value):
         '''Set the target angle for the boat.'''
@@ -52,7 +54,6 @@ class Navigator(object):
 
         # tacking logic
         if target_heading < self.boat.wind.direction + Bearing(45) and target_heading > self.boat.wind.direction - Bearing(45):
-            cone_angle = Bearing(15)
 
             bearing_to_wind = self.boat.position.bearing_to(self.target) - self.boat.wind.direction
 
@@ -60,7 +61,7 @@ class Navigator(object):
             modulus_to_wind = mirror_angle(bearing_to_wind)
 
             # detect if the boat is outside cone
-            if modulus_to_wind >= float(cone_angle):
+            if modulus_to_wind >= float(self.cone_angle):
                 if bearing_to_wind <= 180:
                     target_heading = self.boat.wind.direction + Bearing(45)
                     self.tacking_right = True
@@ -71,7 +72,7 @@ class Navigator(object):
                     self.tacking_left = True
 
             # detects if the boat is inside cone
-            elif modulus_to_wind < float(cone_angle):
+            elif modulus_to_wind < float(self.cone_angle):
                 if self.tacking_left == True: 
                     target_heading = self.boat.wind.direction - Bearing(45)
                 if self.tacking_right == True:
