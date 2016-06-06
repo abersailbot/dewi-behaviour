@@ -31,6 +31,9 @@ class Navigator(object):
         self.integrator = 0
         self.integrator_max = 10000
         self.tacking = False
+        self.tacking_left = True
+        self.tacking_right = False
+        
 
     def set_target(self, value):
         '''Set the target angle for the boat.'''
@@ -71,17 +74,30 @@ class Navigator(object):
 			# Detects if it is outside the cone
             if modulus_to_wind >= float(cone_angle):
                 tacking = False
-                if bearing_to_wind <= 180:
+
+
+               if bearing_to_wind <= 180:
                     target_heading = self.boat.wind.direction - Bearing(45)
+                    self.tacking_right = False
+                    self.tacking_left = True
                 if bearing_to_wind > 180:
                     target_heading = self.boat.wind.direction + Bearing(45)
+                    self.tacking_right = True
+                    self.tacking_left = False
 
 			# Detects if it is inside cone
             elif modulus_to_wind < float(cone_angle):
-                if bearing_to_wind <= 180:      
+
+                if self.tacking_left == True: 
+                    target_heading = self.boat.wind.direction - Bearing(45)
+                if self.tacking_right == True:
+                    target_heading = self.boat.wind.direction + Bearing(45)
+ 
+                     
+            '''    if bearing_to_wind <= 180:      
                     target_heading = self.boat.wind.direction + Bearing(45)
                 if bearing_to_wind > 180:
-                    target_heading = self.boat.wind.direction - Bearing(45)
+                    target_heading = self.boat.wind.direction - Bearing(45)'''
         
         error = current_heading.delta(target_heading)
         self.integrator += error
