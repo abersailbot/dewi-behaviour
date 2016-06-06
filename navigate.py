@@ -48,8 +48,10 @@ class Navigator(object):
         else:
             target_heading = self.target
 
+        temp_target_heading = None
         # tacking logic
         if target_heading < self.boat.wind.direction + Bearing(45) and target_heading > self.boat.wind.direction - Bearing(45):
+            
 
             # FIXME: make relative to wind angle
             
@@ -69,18 +71,23 @@ class Navigator(object):
 			# Detects if it is outside the cone
             if modulus_to_wind > cone_angle:
                 if bearing_to_wind <= 180:
-                    target_heading = self.boat.wind.direction - Bearing(45)
+                    temp_target_heading = self.boat.wind.direction - Bearing(45)
                 if bearing_to_wind > 180:
-                    target_heading = self.boat.wind.direction + Bearing(45)
+                    temp_target_heading = self.boat.wind.direction + Bearing(45)
 
 			# Detects if it is inside cone
             elif modulus_to_wind < cone_angle:
                 if bearing_to_wind <= 180:      
-                    target_heading = self.boat.wind.direction + Bearing(45)
+                    temp_target_heading = self.boat.wind.direction + Bearing(45)
                 if bearing_to_wind > 180:
-                    target_heading = self.boat.wind.direction - Bearing(45)
+                    temp_target_heading = self.boat.wind.direction - Bearing(45)
 
-        error = current_heading.delta(target_heading)
+
+        if target_heading < self.boat.wind.direction + Bearing(45) and target_heading > self.boat.wind.direction - Bearing(45):
+                error = current_heading.delta(temp_target_heading)
+        else
+                error = current_heading.delta(target_heading)
+
         self.integrator += error
         if self.integrator > self.integrator_max:
             self.integrator = self.integrator_max
