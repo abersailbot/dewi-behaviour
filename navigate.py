@@ -5,10 +5,11 @@ import boatdclient
 from boatdclient import Bearing
 
 def mirror_angle(angle):
-        if angle > 180:
-            return 180 - (angle % 180)
-        else: 
-            return angle
+    angle = float(angle)
+    if angle > 180:
+        return 180 - (angle % 180)
+    else:
+        return angle
 
 class Navigator(object):
     '''
