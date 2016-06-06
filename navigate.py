@@ -69,7 +69,7 @@ class Navigator(object):
             modulus_to_wind = mirror_angle(bearing_to_wind)
 
 			# Detects if it is outside the cone
-            if modulus_to_wind > cone_angle:
+            if modulus_to_wind >= float(cone_angle):
                 tacking = False
                 if bearing_to_wind <= 180:
                     target_heading = self.boat.wind.direction - Bearing(45)
@@ -77,7 +77,7 @@ class Navigator(object):
                     target_heading = self.boat.wind.direction + Bearing(45)
 
 			# Detects if it is inside cone
-            elif modulus_to_wind < cone_angle:
+            elif modulus_to_wind < float(cone_angle):
                 if bearing_to_wind <= 180:      
                     target_heading = self.boat.wind.direction + Bearing(45)
                 if bearing_to_wind > 180:
