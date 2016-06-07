@@ -33,7 +33,7 @@ class StationKeepingBehaviour(Navigator):
             if  self.boat.position.bearing_to(self.nearest_line_points[0]) == self.nearest_line_points[0].bearing_to(self.nearest_line_points[1]): 
                 self.line_crossed = True
                 self.enter_time = time.time()
-                
+                # FIXME initialise bearing_to_center hear instead of on startup, once this if statement is fixed above
             return self.bearing_to_center
                 
         elif self.center_reached == True:  
