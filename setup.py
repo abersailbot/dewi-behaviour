@@ -16,7 +16,7 @@ setup(
     scripts=[
         'station-keeping-behaviour',
         'idle-behaviour',
-        'demo-waypoint-behaviour',
+        'waypoint-behaviour',
     ],
     install_requires=[
         'python-boatdclient',
