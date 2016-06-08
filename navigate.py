@@ -21,7 +21,9 @@ class Navigator(object):
     '''
     __metaclass__ = ABCMeta
 
-    def __init__(self):
+    def __init__(self, enable_tacking=True):
+        self.enable_tacking = enable_tacking
+
         self.boat = boatdclient.Boat()
 
         self.target = None
@@ -53,7 +55,9 @@ class Navigator(object):
             target_heading = self.target
 
         # tacking logic
-        if target_heading < self.boat.wind.direction + Bearing(45) and target_heading > self.boat.wind.direction - Bearing(45):
+        if target_heading < self.boat.wind.direction + Bearing(45) and \
+           target_heading > self.boat.wind.direction - Bearing(45) and \
+           self.enable_tacking:
             bearing_to_wind = self.boat.position.bearing_to(self.target) - self.boat.wind.direction
 
             # choose the best initial tack, based on which side of the cone
@@ -140,7 +144,6 @@ class Navigator(object):
                 self.set_target(target)
 
             self.update()
-            time.sleep(0.1)
 
     @abstractmethod
     def check_new_target(self):
