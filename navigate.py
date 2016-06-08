@@ -124,13 +124,13 @@ class Navigator(object):
             if relative_wind_direction >= 290:
                 sail_angle = 0
             elif relative_wind_direction >= 280:
-                sail_angle = 342
+                sail_angle = 18
             elif relative_wind_direction >= 270:
-                sail_angle = 324
+                sail_angle = 36
             elif relative_wind_direction >= 250:
-                sail_angle = 306
+                sail_angle = 54
             else:
-                sail_angle = 288
+                sail_angle = 72
 
         self.boat.set_sail(sail_angle)
 
