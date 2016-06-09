@@ -115,10 +115,10 @@ class Navigator(object):
         relative_wind_direction = self.boat.wind.direction - self.boat.heading
 
         close_hauled_sail_angle = 0
-        close_reach_sail_angle  = 23
-        beam_reach_sail_angle   = 45
-        broad_reach_sail_angle  = 68
-        running_sail_angle      = 90
+        close_reach_sail_angle  = 15
+        beam_reach_sail_angle   = 25
+        broad_reach_sail_angle  = 45
+        running_sail_angle      = 70
 
         if relative_wind_direction < 180:
             if relative_wind_direction < 45:
