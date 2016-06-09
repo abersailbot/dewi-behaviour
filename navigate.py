@@ -114,32 +114,32 @@ class Navigator(object):
 
         relative_wind_direction = self.boat.wind.direction - self.boat.heading
 
-        close_hauled_sail_angle = 0
-        close_reach_sail_angle  = 15
-        beam_reach_sail_angle   = 25
-        broad_reach_sail_angle  = 45
-        running_sail_angle      = 70
+        sail_angle_close_hauled = 0
+        sail_angle_close_reach  = 15
+        sail_angle_beam_reach   = 25
+        sail_angle_broad_reach  = 45
+        sail_angle_running      = 70
 
         if relative_wind_direction < 180:
             if relative_wind_direction < 45:
-                sail_angle = close_hauled_sail_angle
+                sail_angle = sail_angle_close_hauled
             elif relative_wind_direction < 68:
-                sail_angle = close_reach_sail_angle
+                sail_angle = sail_angle_close_reach
             elif relative_wind_direction < 90:
-                sail_angle = beam_reach_sail_angle
+                sail_angle = sail_angle_beam_reach 
             elif relative_wind_direction < 113:
-                sail_angle = broad_reach_sail_angle
+                sail_angle = sail_angle_broad_reach
             else:
                 sail_angle = running_sail_angle
         else:
             if relative_wind_direction >= 315:
-                sail_angle = close_hauled_sail_angle
+                sail_angle = sail_angle_close_hauled
             elif relative_wind_direction >= 292:
-                sail_angle = close_reach_sail_angle
+                sail_angle = sail_angle_close_reach
             elif relative_wind_direction >= 269:
-                sail_angle = beam_reach_sail_angle
+                sail_angle = sail_angle_beam_reach 
             elif relative_wind_direction >= 246:
-                sail_angle = broad_reach_sail_angle
+                sail_angle = sail_angle_broad_reach
             else:
                 sail_angle = running_sail_angle
 
