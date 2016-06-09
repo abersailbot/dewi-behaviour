@@ -121,7 +121,7 @@ class Navigator(object):
             elif relative_wind_direction < 68:
                 sail_angle = sail_angle_close_reach
             elif relative_wind_direction < 90:
-                sail_angle = beam_reach_sail_angle
+                sail_angle = sail_angle_beam_reach 
             elif relative_wind_direction < 113:
                 sail_angle = sail_angle_broad_reach
             else:
@@ -132,7 +132,7 @@ class Navigator(object):
             elif relative_wind_direction >= 292:
                 sail_angle = sail_angle_close_reach
             elif relative_wind_direction >= 269:
-                sail_angle = beam_reach_sail_angle
+                sail_angle = sail_angle_beam_reach 
             elif relative_wind_direction >= 246:
                 sail_angle = sail_angle_broad_reach
             else:
