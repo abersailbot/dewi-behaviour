@@ -13,7 +13,7 @@ class TestBehaviour(Navigator):
         self.set_target(points[0])
         self.current_point = 0
 
-        self.waypoint_checkoff_distance = 6
+        self.waypoint_checkoff_distance = 8
 
     def check_new_target(self):
         distance = self.boat.position.distance_to(self.target)
