@@ -36,6 +36,7 @@ class Navigator(object):
         self.tacking_left = None
         self.tacking_right = None
         self.cone_angle = Bearing(15)
+        self.tacking_angle = Bearing(45)
 
     def set_target(self, value):
         '''Set the target angle for the boat.'''
@@ -55,8 +56,8 @@ class Navigator(object):
             target_heading = self.target
 
         # tacking logic
-        if target_heading < self.boat.wind.direction + Bearing(45) and \
-           target_heading > self.boat.wind.direction - Bearing(45) and \
+        if target_heading < self.boat.wind.direction + self.tacking_angle and \
+           target_heading > self.boat.wind.direction - self.tacking_angle and \
            self.enable_tacking:
             bearing_to_wind = self.boat.position.bearing_to(self.target) - self.boat.wind.direction
 
@@ -76,20 +77,24 @@ class Navigator(object):
             # detect if the boat is outside cone
             if modulus_to_wind >= float(self.cone_angle):
                 if bearing_to_wind <= 180:
-                    target_heading = self.boat.wind.direction + Bearing(45)
+                    target_heading = self.boat.wind.direction + \
+                                     self.tacking_angle
                     self.tacking_right = True
                     self.tacking_left = False
                 if bearing_to_wind > 180:
-                    target_heading = self.boat.wind.direction - Bearing(45)
+                    target_heading = self.boat.wind.direction - \
+                                     self.tacking_angle
                     self.tacking_right = False
                     self.tacking_left = True
 
             # detects if the boat is inside cone
             elif modulus_to_wind < float(self.cone_angle):
                 if self.tacking_left == True: 
-                    target_heading = self.boat.wind.direction - Bearing(45)
+                    target_heading = self.boat.wind.direction - \
+                                     self.tacking_angle
                 if self.tacking_right == True:
-                    target_heading = self.boat.wind.direction + Bearing(45)
+                    target_heading = self.boat.wind.direction + \
+                                     self.tacking_angle
         else:
             self.tacking_left = None
             self.tacking_right = None
