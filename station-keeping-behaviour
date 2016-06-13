@@ -32,7 +32,7 @@ class StationKeepingBehaviour(Navigator):
                 self.time_to_center = time.time() - self.enter_time
             self.center_reached = True
 
-        if self.center_reached == False:  # go toward center
+        if self.center_reached is False:  # go toward center
             #FIXME (?) only when exactly equal to, no error either side
             if self.boat.position.bearing_to(self.nearest_line_points[0]) > \
                self.nearest_line_points[1].bearing_to(self.nearest_line_points[0]) \
@@ -48,7 +48,7 @@ class StationKeepingBehaviour(Navigator):
 
             return None
 
-        elif self.center_reached == True:
+        elif self.center_reached is True:
             if time.time() < self.enter_time + (minutes_in_box * 60) - self.time_to_center:
                 return None
             else:
