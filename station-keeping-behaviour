@@ -14,7 +14,7 @@ class StationKeepingBehaviour(Navigator):
         super(StationKeepingBehaviour, self).__init__(enable_tacking=False)
         self.center = (points[0] + points[1] + points[2] + points[3]) / 4
         self.set_target(self.center)
-        self.bearing_to_center = self.boat.position.bearing_to(self.center)
+        self.edge_bearing_to_center = None
         self.center_reached = False
         self.line_crossed = False
         self.enter_time = None
@@ -40,11 +40,10 @@ class StationKeepingBehaviour(Navigator):
                self.nearest_line_points[1].bearing_to(self.nearest_line_points[0]) \
                + Bearing(5):
 
-                # FIXME initialise bearing_to_center here instead of on startup, once this if statement is fixed above
-
                 print 'YOU HAVE CROSSED THE LINE ' * 20
                 self.line_crossed = True
                 self.enter_time = time.time()
+                self.bearing_edge_to_center = self.boat.position.bearing_to(self.center)
 
             return None
 
@@ -52,7 +51,7 @@ class StationKeepingBehaviour(Navigator):
             if time.time() < self.enter_time + (minutes_in_box * 60) - self.time_to_center:
                 return None
             else:
-                return self.bearing_to_center
+                return self.bearing_edge_to_center
 
 
 if __name__ == '__main__':
