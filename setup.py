@@ -15,7 +15,6 @@ setup(
     modules=['navigate'],
     scripts=[
         'station-keeping-behaviour',
-        'idle-behaviour',
         'waypoint-behaviour',
     ],
     install_requires=[
