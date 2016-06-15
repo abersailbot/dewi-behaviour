@@ -8,10 +8,10 @@ class IdleBehaviour(Navigator):
     def __init__(self):
         super(IdleBehaviour, self).__init__()
         self.home_point = boatdclient.get_home_position()
-        self.init_point = self.boat.position()
-        if self.home_point == None
+        self.init_point = self.boat.position
+        if self.home_point is None:
             self.set_target(self.init_point)
-        else 
+        else:
             self.set_target(self.home_point)                
         
     def check_new_target(self):   
