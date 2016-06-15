@@ -10,7 +10,7 @@ from navigate import Navigator
 class IdleBehaviour(Navigator):
     def __init__(self):
         super(IdleBehaviour, self).__init__()
-        self.home_point = boatdclient.get_home_waypoint()
+        self.home_point = boatdclient.get_home_position()
         self.init_point = self.boat.position()
         if self.home_point == None
             self.set_target(self.init_point)
