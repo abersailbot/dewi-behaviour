@@ -18,7 +18,8 @@ class IdleBehaviour(Navigator):
             self.set_target(self.home_point)
                 
         
-    def check_new_target(self):        
+    def check_new_target(self):   
+        pass     
 
 
 if __name__ == '__main__':
