@@ -35,19 +35,19 @@ class StationKeepingBehaviour(Navigator):
                 self.time_to_center = time.time() - self.at_line_time
             self.center_reached = True
 
-        if self.center_reached is False:  # go toward center
-            #FIXME (?) only when exactly equal to, no error either side
+        if self.center_reached is False:
+        
+            # This takes the time that the boat is at a distance either side of the edge
+            # of the box, and averages these times to find when the edge was crossed
             if cross_track_distance(self.nearest_line_points[1], self.nearest_line_points[0]) <= 2 and \ 
-               self.band_entered is False:
-            
+               self.band_entered is False:            
                 print 'YOU HAVE ENTERED THE BAND ' * 20
                 self.band_entered = True
                 self.enter_time = time.time()
                 self.bearing_edge_to_center = self.boat.position.bearing_to(self.center)
                 
             if cross_track_distance(self.nearest_line_points[1], self.nearest_line_points[0]) >= 2 and \ 
-               self.band_entered is True and self.band_exited is False:
-               
+               self.band_entered is True and self.band_exited is False:               
                 print 'YOU HAVE EXITED THE BAND ' * 20
                 self.band_exited = True
                 self.exit_time = time.time()
