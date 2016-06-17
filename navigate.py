@@ -109,8 +109,8 @@ class Navigator(object):
             self.tacking_left = None
             self.tacking_right = None
             
-        # FIXME delta can return negative values but currently cross_track_error
-        # is only ever positive. Need to be both +ve or both -ve to work.  
+        # FIXME check if both values are of the correct sign with respect to
+        # eachother   
         error = current_heading.delta(target_heading) + self.cross_track_error
         self.integrator += error
         if self.integrator > self.integrator_max:
