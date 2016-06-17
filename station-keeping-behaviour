@@ -25,6 +25,11 @@ class StationKeepingBehaviour(Navigator):
             sorted_points.append((self.boat.position.distance_to(point), point))
         self.nearest_line_points = sorted(sorted_points, key=lambda x: x[0])
         self.nearest_line_points = [n[1] for n in self.nearest_line_points][0:2]
+        
+        if cross_track_distance(self.nearest_line_points[1], self.nearest_line_points[0]) < 0:
+            self.start_negative = True
+        else:
+            self.start_negative = False
 
     def check_new_target(self):
         if self.boat.position.distance_to(self.center) < 1:
@@ -32,14 +37,9 @@ class StationKeepingBehaviour(Navigator):
                 self.time_to_center = time.time() - self.enter_time
             self.center_reached = True
 
-        if self.center_reached is False:  # go toward center
-            #FIXME (?) only when exactly equal to, no error either side
-            if self.boat.position.bearing_to(self.nearest_line_points[0]) > \
-               self.nearest_line_points[1].bearing_to(self.nearest_line_points[0]) \
-               and self.boat.position.bearing_to(self.nearest_line_points[0]) < \
-               self.nearest_line_points[1].bearing_to(self.nearest_line_points[0]) \
-               + Bearing(5):
-
+        if self.center_reached is False:             
+            if  (cross_track_distance(self.nearest_line_points[1], self.nearest_line_points[0]) <= 0 and start_negative is False) or (cross_track_distance(self.nearest_line_points[1], self.nearest_line_points[0]) >= 0 and start_negative is True):
+                      
                 print 'YOU HAVE CROSSED THE LINE ' * 20
                 self.line_crossed = True
                 self.enter_time = time.time()
