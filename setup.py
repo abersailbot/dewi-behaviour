@@ -14,8 +14,9 @@ setup(
     url='https://github.com/abersailbot/dewi-behaviour',
     modules=['navigate'],
     scripts=[
-        'station-keeping-behaviour',
         'idle-behaviour',
+        'station-keeping-behaviour',
+        'virtual-anchoring-behaviour',
         'waypoint-behaviour',
     ],
     install_requires=[
