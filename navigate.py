@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 import time
+import math
 
 import boatdclient
 from boatdclient import Bearing
@@ -27,6 +28,7 @@ class Navigator(object):
         self.boat = boatdclient.Boat()
 
         self.target = None
+        self.prev_target = None
 
         self.k_p = 0.6
         self.k_i = 0.003
@@ -37,6 +39,8 @@ class Navigator(object):
         self.tacking_right = None
         self.cone_angle = Bearing(15)
         self.tacking_angle = Bearing(45)
+        
+        self.cross_track_error = 0
 
     def set_target(self, value):
         '''Set the target angle for the boat.'''
@@ -54,6 +58,11 @@ class Navigator(object):
             target_heading = self.boat.position.bearing_to(self.target)
         else:
             target_heading = self.target
+            
+        ideal_heading = self.prev_target.bearing_to(self.target)
+        dist_from_ideal = self.boat.position.distance_to(self.target) * math.tan((math.pi * target_heading.delta(ideal_heading))/180)
+        # TODO find ideal constant to properly scale up/down effects of cross track error
+        self.cross_track_error = dist_from_ideal * 1
 
         # tacking logic
         if target_heading < self.boat.wind.direction + self.tacking_angle and \
@@ -99,7 +108,7 @@ class Navigator(object):
             self.tacking_left = None
             self.tacking_right = None
         
-        error = current_heading.delta(target_heading)
+        error = current_heading.delta(target_heading) + self.cross_track_error
         self.integrator += error
         if self.integrator > self.integrator_max:
             self.integrator = self.integrator_max
@@ -152,6 +161,7 @@ class Navigator(object):
         while True:
             target = self.check_new_target()
             if target is not None:
+                self.prev_target = self.target
                 self.set_target(target)
 
             self.update()
