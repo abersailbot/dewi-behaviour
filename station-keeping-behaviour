@@ -38,7 +38,9 @@ class StationKeepingBehaviour(Navigator):
             self.center_reached = True
 
         if self.center_reached is False:             
-            if  (self.boat.position.cross_track_distance(self.nearest_line_points[1], self.nearest_line_points[0]) <= 0 and start_negative is False) or (self.boat.position.cross_track_distance(self.nearest_line_points[1], self.nearest_line_points[0]) >= 0 and start_negative is True):
+            if  (self.boat.position.cross_track_distance(self.nearest_line_points[1], self.nearest_line_points[0]) <= 0 and \
+                start_negative is False) or (self.boat.position.cross_track_distance(self.nearest_line_points[1], \ 
+                self.nearest_line_points[0]) >= 0 and start_negative is True):
                       
                 print 'YOU HAVE CROSSED THE LINE ' * 20
                 self.line_crossed = True
