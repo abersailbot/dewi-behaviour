@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+import time
+
+import boatdclient
+from boatdclient import Point, Bearing
+
+from navigate import Navigator
+
+points = boatdclient.get_current_waypoints()
+
+
+class VirtualAnchoringBehaviour(Navigator):
+    def __init__(self):
+        super(VirtualAnchoringBehaviour, self).__init__(enable_tacking=False)
+
+    def check_new_target(self):
+        pass
+
+
+if __name__ == '__main__':
+    behaviour = VirtualAnchoringBehaviour()
+    behaviour.run()
