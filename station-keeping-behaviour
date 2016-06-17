@@ -32,7 +32,7 @@ class StationKeepingBehaviour(Navigator):
     def check_new_target(self):
         if self.boat.position.distance_to(self.center) < 1:
             if self.center_reached is False:
-                self.time_to_center = time.time() - self.enter_time
+                self.time_to_center = time.time() - self.at_line_time
             self.center_reached = True
 
         if self.center_reached is False:  # go toward center
