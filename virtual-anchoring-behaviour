@@ -12,7 +12,8 @@ points = boatdclient.get_current_waypoints()
 class VirtualAnchoringBehaviour(Navigator):
     def __init__(self):
         super(VirtualAnchoringBehaviour, self).__init__(enable_tacking=False)
-
+        self.set_target(points[0])
+        
     def check_new_target(self):
         pass
 
