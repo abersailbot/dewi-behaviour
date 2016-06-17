@@ -59,8 +59,11 @@ class Navigator(object):
         else:
             target_heading = self.target
             
-        # TODO find ideal constant to properly scale up/down effects of cross track error
-        self.cross_track_error = cross_track_distance(self.prev_target, self.target) * 1
+        if self.prev_target is not None and self.target is not None:
+            # TODO find ideal constant to properly scale up/down effects of cross track error
+            self.cross_track_error = cross_track_distance(self.prev_target, self.target) * 1
+        else:
+            self.cross_track_error = 0
 
         # tacking logic
         if target_heading < self.boat.wind.direction + self.tacking_angle and \
