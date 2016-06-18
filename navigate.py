@@ -22,8 +22,11 @@ class Navigator(object):
     '''
     __metaclass__ = ABCMeta
 
-    def __init__(self, enable_tacking=True):
+    def __init__(self,
+                 enable_tacking=True,
+                 enable_cross_track_minimization=True):
         self.enable_tacking = enable_tacking
+        self.enable_cross_track_minimization = enable_cross_track_minimization
 
         self.boat = boatdclient.Boat()
 
@@ -59,11 +62,12 @@ class Navigator(object):
         else:
             target_heading = self.target
             
-        if isinstance(self.prev_target, boatdclient.Point) and isinstance(self.target, boatdclient.Point):
-            # TODO find ideal constant to properly scale up/down effects of cross track error
-            self.cross_track_error = self.boat.position.cross_track_distance(self.prev_target, self.target) * 1
-        else:
-            self.cross_track_error = 0
+        if self.enable_cross_track_minimization:
+            if isinstance(self.prev_target, boatdclient.Point) and isinstance(self.target, boatdclient.Point):
+                # TODO find ideal constant to properly scale up/down effects of cross track error
+                self.cross_track_error = self.boat.position.cross_track_distance(self.prev_target, self.target) * 1
+            else:
+                self.cross_track_error = 0
 
         # tacking logic
         if target_heading < self.boat.wind.direction + self.tacking_angle and \
