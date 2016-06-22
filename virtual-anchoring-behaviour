@@ -7,15 +7,21 @@ from boatdclient import Point, Bearing
 from navigate import Navigator
 
 points = boatdclient.get_current_waypoints()
+center_point = points[0]
+circle_radius = 3
 
 
 class VirtualAnchoringBehaviour(Navigator):
     def __init__(self):
-        super(VirtualAnchoringBehaviour, self).__init__(enable_tacking=False)
-        self.set_target(points[0])
+        super(VirtualAnchoringBehaviour, self).__init__(enable_tacking=False)           
+        self.set_target(center_point)
         
     def check_new_target(self):
-        pass
+        if self.boat.position.distance_to(center_point) > circle_radius:
+            return center_point
+        else:        
+            # boat will always sail anticlockwise around center_point
+            return self.boat.position.bearing_to(center_point) + Bearing(90)
 
 
 if __name__ == '__main__':
