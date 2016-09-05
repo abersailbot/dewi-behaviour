@@ -101,8 +101,8 @@ class Navigator(object):
                     self.tacking_right = False
                     self.tacking_left = True
 
-            # detects if the boat is inside cone
-            elif modulus_to_wind < float(self.cone_angle):
+            # else the boat is inside cone
+            else:
                 if self.tacking_left is True: 
                     target_heading = self.boat.wind.direction - \
                                      self.tacking_angle
