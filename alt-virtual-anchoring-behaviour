@@ -9,7 +9,7 @@ points = boatdclient.get_current_waypoints()
 
 class VirtualAnchoringBehaviour(Navigator):
     def __init__(self):
-        super(TestBehaviour, self).__init__()
+        super(VirtualAnchoringBehaviour, self).__init__(enable_tacking=True)
         self.current_point = 0
         self.anchoring_triangle = [points[0].relative_point(boatd.BaseBoatdDriver.wind_direction(), 10),
                                   [points[0].relative_point(boatd.BaseBoatdDriver.wind_direction() + 90, 10),
