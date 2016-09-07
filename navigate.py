@@ -27,12 +27,12 @@ class Navigator(object):
 
     def __init__(self,
                  enable_tacking=True,
-                 enable_cross_track_minimization=True
-                 minimum_tack_progress=0.5):
+                 enable_cross_track_minimization=True,
+                 minimum_tack_progress=0.025,
+                 minimum_tack_progress_time=30):
 
         self.enable_tacking = enable_tacking
         self.enable_cross_track_minimization = enable_cross_track_minimization
-        self.minimum_tack_progress
         self.boat = boatdclient.Boat()
 
         self.target = None
@@ -47,6 +47,9 @@ class Navigator(object):
         self.tacking_right = None
         self.cone_angle = Bearing(15)
         self.tacking_angle = Bearing(45)
+        self.minimum_tack_progress = minimum_tack_progress
+        self.last_time_with_tacking_progress = 0
+        self.minimum_tack_progress_time
 
         self.cross_track_error = 0
 
@@ -110,9 +113,15 @@ class Navigator(object):
 
             # else the boat is inside cone
             else:
-                if not tack_making_progress:
+
+                if self.tack_making_progress
+                    self.last_time_with_tacking_progress = time.time()
+
+                elif (time.time() - self.last_time_with_tacking_progress) > \
+                self.minimum_tack_progress_time:
                     self.tacking_right = !self.tacking_right
                     self.tacking_left = !self.tacking_left
+
                 if self.tacking_left is True:
                     target_heading = self.boat.wind.direction - \
                                      self.tacking_angle
@@ -120,6 +129,7 @@ class Navigator(object):
                     target_heading = self.boat.wind.direction + \
                                      self.tacking_angle
         else:
+            self.last_time_with_tacking_progress = 0
             self.tacking_left = None
             self.tacking_right = None
 
@@ -141,7 +151,7 @@ class Navigator(object):
         target_heading = self.boat.wind.direction - \
                          self.tacking_angle
 
-        tack_progress = self.boat.speed * math.cos(actual_heading - target_heading)
+        tack_progress = self.gps.fix.speed * math.cos(actual_heading - target_heading)
         if tack_progress > minimum_tack_progress:
             return True
 
