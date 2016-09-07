@@ -138,7 +138,10 @@ class Navigator(object):
     def update_sail(self):
         '''Set the sail to the correct angle based on current wind direction'''
 
-        relative_wind_direction = self.boat.wind.relative_direction
+        # not really sure why this 180 needs to exist, but it's a quick bodge
+        # to make it work. This should probably be fixed elsewhere at a later
+        # date. I suspect boatd/python-boatd has some problems somewhere.
+        relative_wind_direction = self.boat.wind.relative_direction + 180
 
         sail_angle_close_hauled = 0
         sail_angle_close_reach  = 10
