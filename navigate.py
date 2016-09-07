@@ -114,13 +114,13 @@ class Navigator(object):
             # else the boat is inside cone
             else:
 
-                if self.tack_making_progress
+                if self.tack_making_progress:
                     self.last_time_with_tacking_progress = time.time()
 
                 elif (time.time() - self.last_time_with_tacking_progress) > \
                 self.minimum_tack_progress_time:
-                    self.tacking_right = !self.tacking_right
-                    self.tacking_left = !self.tacking_left
+                    self.tacking_right = not self.tacking_right
+                    self.tacking_left = not self.tacking_left
 
                 if self.tacking_left is True:
                     target_heading = self.boat.wind.direction - \
@@ -145,7 +145,7 @@ class Navigator(object):
         self.boat.set_rudder( -(self.k_p * error + self.k_i * self.integrator))
         self.update_sail()
 
-    def tack_making_progress(self)
+    def tack_making_progress(self):
         self.gps.next();
         actual_heading = Bearing(self.gps.fix.track)
         target_heading = self.boat.wind.direction - \
