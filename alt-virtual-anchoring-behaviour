@@ -26,7 +26,7 @@ class VirtualAnchoringBehaviour(Navigator):
                 self.current_point = 0
             else:
                 self.current_point += 1
-            return anchoring_triangle[self.current_point]
+            return self.anchoring_triangle[self.current_point]
         else:
             print 'distance to point', distance
             return None
