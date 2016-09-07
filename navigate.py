@@ -15,7 +15,7 @@ def mirror_angle(angle):
 
 class Navigator(object):
     '''
-    Abstract class used to implement behaviours. 
+    Abstract class used to implement behaviours.
 
     This should be inherited from and ``check_new_target`` defined to create a
     behaviour with some targets. See ``demo-waypoint-behaviour`` for an example
@@ -25,26 +25,48 @@ class Navigator(object):
 
     def __init__(self,
                  enable_tacking=True,
-                 enable_cross_track_minimization=True):
+                 enable_cross_track_minimization=True,
+                 enable_emergency_maneuver=True):
         self.enable_tacking = enable_tacking
         self.enable_cross_track_minimization = enable_cross_track_minimization
+        self.enable_emergency_maneuver = enable_emergency_maneuver
 
         self.boat = boatdclient.Boat()
 
         self.target = None
         self.prev_target = None
 
+        # how long the rudder can be hardover for before trying to snap the boat
+        # out of it in an emergency
+        self.hardover_rudder_timeout = 20
+
+        # how far over the rudder can be before we assume it's hardover in and emergency
+        self.hardover_rudder_threshold = 40
+
         self.k_p = 0.6
-        self.k_i = 0.01
+        self.k_i = 0.0
         self.integrator = 0
         self.integrator_max = 200
+
+        # tracks the last time the the rudder was in a good position (i.e. not hard over)
+        self.last_time_rudder_not_maxed = 0
 
         self.tacking_left = None
         self.tacking_right = None
         self.cone_angle = Bearing(15)
         self.tacking_angle = Bearing(45)
-        
+
         self.cross_track_error = 0
+
+    def override_rudder(self):
+        timeout = time.time() + 10
+        initial_heading = self.boat.heading
+
+        rudder_angle = -45 if self.boat.rudder_angle > 0 else 45
+        self.boat.set_rudder(rudder_angle)
+        while time.time() < timeout or \
+                abs(initial_heading.delta(self.boat.heading)) < 170:
+            time.sleep(0.1)
 
     def set_target(self, value):
         '''Set the target angle for the boat.'''
@@ -56,13 +78,12 @@ class Navigator(object):
 
         # this currently always assumes that self.target will return a long/lat
         # point
-
         current_heading = self.boat.heading
         if isinstance(self.target, boatdclient.Point):
             target_heading = self.boat.position.bearing_to(self.target)
         else:
             target_heading = self.target
-            
+
         if self.enable_cross_track_minimization:
             if isinstance(self.prev_target, boatdclient.Point) and isinstance(self.target, boatdclient.Point):
                 # TODO find ideal constant to properly scale up/down effects of cross track error
@@ -104,7 +125,7 @@ class Navigator(object):
 
             # else the boat is inside cone
             else:
-                if self.tacking_left is True: 
+                if self.tacking_left is True:
                     target_heading = self.boat.wind.direction - \
                                      self.tacking_angle
                 if self.tacking_right is True:
@@ -113,9 +134,9 @@ class Navigator(object):
         else:
             self.tacking_left = None
             self.tacking_right = None
-            
+
         # FIXME check if both values are of the correct sign with respect to
-        # eachother   
+        # eachother
         error = current_heading.delta(target_heading) + self.cross_track_error
         self.integrator += error
         if self.integrator > self.integrator_max:
@@ -129,6 +150,14 @@ class Navigator(object):
             rudder_angle = 180
         if rudder_angle < -180:
             rudder_angle = -180
+
+        # emergency procedure to get the boat to turn the opposite direction
+        # when stuck trying to turn towards a target heading
+        if self.enable_emergency_maneuver:
+            if abs(rudder_angle) < self.hardover_rudder_threshold:
+                self.last_time_rudder_not_maxed = time.time()
+            elif time.time() - self.last_time_rudder_not_maxed > self.hardover_rudder_timeout:
+                override_rudder()
 
         print('heading:', current_heading, '	wanted:', target_heading, '	error:',
               error, '	integrator:', self.integrator, '	target:', self.target, '	rudder_angle:', rudder_angle)
@@ -155,7 +184,7 @@ class Navigator(object):
             elif relative_wind_direction < 68:
                 sail_angle = sail_angle_close_reach
             elif relative_wind_direction < 90:
-                sail_angle = sail_angle_beam_reach 
+                sail_angle = sail_angle_beam_reach
             elif relative_wind_direction < 113:
                 sail_angle = sail_angle_broad_reach
             else:
@@ -166,7 +195,7 @@ class Navigator(object):
             elif relative_wind_direction >= 292:
                 sail_angle = sail_angle_close_reach
             elif relative_wind_direction >= 269:
-                sail_angle = sail_angle_beam_reach 
+                sail_angle = sail_angle_beam_reach
             elif relative_wind_direction >= 246:
                 sail_angle = sail_angle_broad_reach
             else:
