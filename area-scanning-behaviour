@@ -16,7 +16,10 @@ class AreaScanningBehaviour(Navigator):
                                                         enable_cross_track_minimization=False)
         self.start_crossed = False
         self.enter_time = None
+        self.current_point = 3
+        self.waypoint_checkoff_distance = 8
         
+        self.set_target((points[0]+points[1]) / 2)
                 
         if self.boat.position.cross_track_distance(points[1], points[0]) < 0:
             self.start_negative = True
@@ -32,7 +35,7 @@ class AreaScanningBehaviour(Navigator):
                 print 'YOU HAVE CROSSED THE START ' * 20
                 self.start_crossed = True
                 self.enter_time = time.time()
-                
+                return points[3]
             else:
                 return (points[0]+points[1]) / 2
                 
@@ -40,7 +43,15 @@ class AreaScanningBehaviour(Navigator):
             return points[2]
             
             else:
-                
+                distance = self.boat.position.distance_to(self.target)
+                if distance <= self.waypoint_checkoff_distance:
+                    print 'distance from point:', distance
+                    self.current_point += 1
+                    return points[self.current_point]
+                else:
+                    print 'distance to point', distance
+                    return None
+
                 
 if __name__ == '__main__':
     behaviour = AreaScanningBehaviour()
