@@ -9,13 +9,13 @@ points = boatdclient.get_current_waypoints()
 
 class VirtualAnchoringBehaviour(Navigator):
     def __init__(self):
-        super(VirtualAnchoringBehaviour, self).__init__(enable_tacking=True, enable_cross_track_minimization = False)
+        super(VirtualAnchoringBehaviour, self).__init__(enable_tacking=True,
+                                                        enable_cross_track_minimization=False)
         self.set_target(points[0])
-
 
     def check_new_target(self):
         distance = self.boat.position.distance_to(self.target)
-        
+
         print 'distance from point:', distance
         return points[0]
 
