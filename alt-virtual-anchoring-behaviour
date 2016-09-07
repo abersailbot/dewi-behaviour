@@ -12,7 +12,7 @@ class VirtualAnchoringBehaviour(Navigator):
         super(VirtualAnchoringBehaviour, self).__init__(enable_tacking=True,
                                                         enable_cross_track_minimization=False)
         self.current_point = 0
-        self.anchoring_triangle = [points[0]
+        self.anchoring_triangle = [points[0],
                                    points[1],
                                    points[2]]
         self.set_target(self.anchoring_triangle[0])
