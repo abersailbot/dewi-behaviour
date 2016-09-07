@@ -123,9 +123,16 @@ class Navigator(object):
         elif self.integrator < -self.integrator_max:
             self.integrator = -self.integrator_max
 
+        rudder_angle = -(self.k_p * error + self.k_i * self.integrator)
+
+        if rudder_angle > 180:
+            rudder_angle = 180
+        if rudder_angle < -180:
+            rudder_angle = -180
+
         print('heading:', current_heading, '	wanted:', target_heading, '	error:',
-              error, '	integrator:', self.integrator, '	target:', self.target)
-        self.boat.set_rudder( -(self.k_p * error + self.k_i * self.integrator))
+              error, '	integrator:', self.integrator, '	target:', self.target, '	rudder_angle:', rudder_angle)
+        self.boat.set_rudder(rudder_angle)
         self.update_sail()
 
     def update_sail(self):
