@@ -2,8 +2,11 @@ from abc import ABCMeta, abstractmethod
 import time
 import math
 
+import gps as gpsd
+
 import boatdclient
-from boatdclient import Bearing
+from boatdclient import Bearing, Point
+
 
 def mirror_angle(angle):
     angle = float(angle)
@@ -14,7 +17,7 @@ def mirror_angle(angle):
 
 class Navigator(object):
     '''
-    Abstract class used to implement behaviours. 
+    Abstract class used to implement behaviours.
 
     This should be inherited from and ``check_new_target`` defined to create a
     behaviour with some targets. See ``demo-waypoint-behaviour`` for an example
@@ -24,10 +27,12 @@ class Navigator(object):
 
     def __init__(self,
                  enable_tacking=True,
-                 enable_cross_track_minimization=True):
+                 enable_cross_track_minimization=True
+                 minimum_tack_progress=0.5):
+
         self.enable_tacking = enable_tacking
         self.enable_cross_track_minimization = enable_cross_track_minimization
-
+        self.minimum_tack_progress
         self.boat = boatdclient.Boat()
 
         self.target = None
@@ -42,8 +47,10 @@ class Navigator(object):
         self.tacking_right = None
         self.cone_angle = Bearing(15)
         self.tacking_angle = Bearing(45)
-        
+
         self.cross_track_error = 0
+
+        self.gps = gpsd.gps(mode=WATCH_ENABLE)
 
     def set_target(self, value):
         '''Set the target angle for the boat.'''
@@ -61,7 +68,7 @@ class Navigator(object):
             target_heading = self.boat.position.bearing_to(self.target)
         else:
             target_heading = self.target
-            
+
         if self.enable_cross_track_minimization:
             if isinstance(self.prev_target, boatdclient.Point) and isinstance(self.target, boatdclient.Point):
                 # TODO find ideal constant to properly scale up/down effects of cross track error
@@ -103,7 +110,10 @@ class Navigator(object):
 
             # else the boat is inside cone
             else:
-                if self.tacking_left is True: 
+                if not tack_making_progress:
+                    self.tacking_right = !self.tacking_right
+                    self.tacking_left = !self.tacking_left
+                if self.tacking_left is True:
                     target_heading = self.boat.wind.direction - \
                                      self.tacking_angle
                 if self.tacking_right is True:
@@ -112,9 +122,9 @@ class Navigator(object):
         else:
             self.tacking_left = None
             self.tacking_right = None
-            
+
         # FIXME check if both values are of the correct sign with respect to
-        # eachother   
+        # eachother
         error = current_heading.delta(target_heading) + self.cross_track_error
         self.integrator += error
         if self.integrator > self.integrator_max:
@@ -125,10 +135,23 @@ class Navigator(object):
         self.boat.set_rudder( -(self.k_p * error + self.k_i * self.integrator))
         self.update_sail()
 
+    def tack_making_progress(self)
+        self.gps.next();
+        actual_heading = Bearing(self.gps.fix.track)
+        target_heading = self.boat.wind.direction - \
+                         self.tacking_angle
+
+        tack_progress = self.boat.speed * math.cos(actual_heading - target_heading)
+        if tack_progress > minimum_tack_progress:
+            return True
+
+        return False
+
+
     def update_sail(self):
         '''Set the sail to the correct angle based on current wind direction'''
 
-        relative_wind_direction = self.boat.wind.relative_direction
+        relative_wind_direction = self.boat.wind.relative_directione
 
         sail_angle_close_hauled = 0
         sail_angle_close_reach  = 15
@@ -142,7 +165,7 @@ class Navigator(object):
             elif relative_wind_direction < 68:
                 sail_angle = sail_angle_close_reach
             elif relative_wind_direction < 90:
-                sail_angle = sail_angle_beam_reach 
+                sail_angle = sail_angle_beam_reach
             elif relative_wind_direction < 113:
                 sail_angle = sail_angle_broad_reach
             else:
@@ -153,7 +176,7 @@ class Navigator(object):
             elif relative_wind_direction >= 292:
                 sail_angle = sail_angle_close_reach
             elif relative_wind_direction >= 269:
-                sail_angle = sail_angle_beam_reach 
+                sail_angle = sail_angle_beam_reach
             elif relative_wind_direction >= 246:
                 sail_angle = sail_angle_broad_reach
             else:
