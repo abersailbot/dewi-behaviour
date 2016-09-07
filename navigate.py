@@ -1,3 +1,4 @@
+from __future__ import print_function
 from abc import ABCMeta, abstractmethod
 import time
 import math
@@ -33,10 +34,10 @@ class Navigator(object):
         self.target = None
         self.prev_target = None
 
-        self.k_p = 0.6
-        self.k_i = 0.003
+        self.k_p = 0.4
+        self.k_i = 0.2
         self.integrator = 0
-        self.integrator_max = 10000
+        self.integrator_max = 200
 
         self.tacking_left = None
         self.tacking_right = None
@@ -119,10 +120,19 @@ class Navigator(object):
         self.integrator += error
         if self.integrator > self.integrator_max:
             self.integrator = self.integrator_max
+        elif self.integrator < -self.integrator_max:
+            self.integrator = -self.integrator_max
+
+        rudder_angle = -(self.k_p * error + self.k_i * self.integrator)
+
+        if rudder_angle > 180:
+            rudder_angle = 180
+        if rudder_angle < -180:
+            rudder_angle = -180
 
         print('heading:', current_heading, '	wanted:', target_heading, '	error:',
-              error, '	integrator:', self.integrator, '	target:', self.target)
-        self.boat.set_rudder( -(self.k_p * error + self.k_i * self.integrator))
+              error, '	integrator:', self.integrator, '	target:', self.target, '	rudder_angle:', rudder_angle)
+        self.boat.set_rudder(rudder_angle)
         self.update_sail()
 
     def update_sail(self):
