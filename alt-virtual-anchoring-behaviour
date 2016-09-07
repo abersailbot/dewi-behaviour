@@ -12,8 +12,8 @@ class VirtualAnchoringBehaviour(Navigator):
         super(VirtualAnchoringBehaviour, self).__init__(enable_tacking=True)
         self.current_point = 0
         self.anchoring_triangle = [points[0].relative_point(boatd.BaseBoatdDriver.wind_direction(), 10),
-                                  [points[0].relative_point(boatd.BaseBoatdDriver.wind_direction() + 90, 10),
-                                  [points[0].relative_point(boatd.BaseBoatdDriver.wind_direction() - 90, 10)]
+                                   points[0].relative_point(boatd.BaseBoatdDriver.wind_direction() + 90, 10),
+                                   points[0].relative_point(boatd.BaseBoatdDriver.wind_direction() - 90, 10)]
         self.set_target(anchoring_triangle[0])
                                   
         self.waypoint_checkoff_distance = 3
