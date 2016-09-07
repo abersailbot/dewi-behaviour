@@ -120,6 +120,8 @@ class Navigator(object):
         self.integrator += error
         if self.integrator > self.integrator_max:
             self.integrator = self.integrator_max
+        elif self.integrator < -self.integrator_max:
+            self.integrator = -self.integrator_max
 
         print('heading:', current_heading, '	wanted:', target_heading, '	error:',
               error, '	integrator:', self.integrator, '	target:', self.target)
