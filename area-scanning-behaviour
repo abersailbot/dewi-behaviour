@@ -1,0 +1,47 @@
+#!/usr/bin/env python
+
+import boatdclient
+
+from navigate import Navigator
+
+#first two points must be the start line, next point must be the 
+#point for the finish line
+points = boatdclient.get_current_waypoints()
+MAX_BOX_TIME = 30
+TIME_TO_LEAVE = 10
+
+class AreaScanningBehaviour(Navigator):
+    def __init__(self):
+        super(AreaScanningBehaviour, self).__init__(enable_tacking=True,
+                                                        enable_cross_track_minimization=False)
+        self.start_crossed = False
+        self.enter_time = None
+        
+                
+        if self.boat.position.cross_track_distance(points[1], points[0]) < 0:
+            self.start_negative = True
+        else:
+            self.start_negative = False
+
+    def check_new_target(self):    
+        if self.start_crossed is False:             
+            if  (self.boat.position.cross_track_distance(points[1], points[0]) <= 0 and \
+                self.start_negative is False) or (self.boat.position.cross_track_distance(points[1], \
+                points[0]) >= 0 and self.start_negative is True):
+                      
+                print 'YOU HAVE CROSSED THE START ' * 20
+                self.start_crossed = True
+                self.enter_time = time.time()
+                
+            else:
+                return (points[0]+points[1]) / 2
+                
+        if self.start_crossed is True and time.time() >= self.enter_time + (MAX_BOX_TIME - TIME_TO_LEAVE):
+            return points[2]
+            
+            else:
+                
+                
+if __name__ == '__main__':
+    behaviour = AreaScanningBehaviour()
+    behaviour.run()
