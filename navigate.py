@@ -34,8 +34,8 @@ class Navigator(object):
         self.target = None
         self.prev_target = None
 
-        self.k_p = 0.4
-        self.k_i = 0.2
+        self.k_p = 0.6
+        self.k_i = 0.01
         self.integrator = 0
         self.integrator_max = 200
 
