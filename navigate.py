@@ -26,7 +26,7 @@ class Navigator(object):
     def __init__(self,
                  enable_tacking=True,
                  enable_cross_track_minimization=True,
-                 enable_emergency_maneuver=False):
+                 enable_emergency_maneuver=True):
         self.enable_tacking = enable_tacking
         self.enable_cross_track_minimization = enable_cross_track_minimization
         self.enable_emergency_maneuver = enable_emergency_maneuver
@@ -49,7 +49,7 @@ class Navigator(object):
         self.integrator_max = 200
 
         # tracks the last time the the rudder was in a good position (i.e. not hard over)
-        self.last_time_rudder_not_maxed = 0
+        self.last_time_rudder_not_maxed = time.time()
 
         self.tacking_left = None
         self.tacking_right = None
@@ -58,14 +58,16 @@ class Navigator(object):
 
         self.cross_track_error = 0
 
-    def override_rudder(self):
+    def override_rudder(self, rudder_angle):
+        print('override_rudder ing')
         timeout = time.time() + 10
         initial_heading = self.boat.heading
 
-        rudder_angle = -45 if self.boat.rudder_angle > 0 else 45
+        rudder_angle = -45 if rudder_angle > 0 else 45
         self.boat.set_rudder(rudder_angle)
-        while time.time() < timeout or \
+        while time.time() < timeout and \
                 abs(initial_heading.delta(self.boat.heading)) < 170:
+            print('override_rudder ong', timeout - time.time())
             time.sleep(0.1)
 
     def set_target(self, value):
@@ -88,6 +90,7 @@ class Navigator(object):
             if isinstance(self.prev_target, boatdclient.Point) and isinstance(self.target, boatdclient.Point):
                 # TODO find ideal constant to properly scale up/down effects of cross track error
                 self.cross_track_error = self.boat.position.cross_track_distance(self.prev_target, self.target) * 5
+                print('cross_track_error:', self.cross_track_error)
             else:
                 self.cross_track_error = 0
 
@@ -154,10 +157,15 @@ class Navigator(object):
         # emergency procedure to get the boat to turn the opposite direction
         # when stuck trying to turn towards a target heading
         if self.enable_emergency_maneuver:
+            print('rudder_angle:', rudder_angle, 'hardover_rudder_timeout:', self.hardover_rudder_timeout)
             if abs(rudder_angle) < self.hardover_rudder_threshold:
                 self.last_time_rudder_not_maxed = time.time()
             elif time.time() - self.last_time_rudder_not_maxed > self.hardover_rudder_timeout:
-                self.override_rudder()
+                print('time.time(), self.last_time_rudder_not_maxed', time.time(), self.last_time_rudder_not_maxed)
+                self.override_rudder(rudder_angle)
+
+                # allow 60 seconds to recover from the maneuver
+                self.last_time_rudder_not_maxed = time.time() + 60
 
         print('heading:', current_heading, '	wanted:', target_heading, '	error:',
               error, '	integrator:', self.integrator, '	target:', self.target, '	rudder_angle:', rudder_angle)
