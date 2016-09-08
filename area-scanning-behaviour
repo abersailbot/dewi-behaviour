@@ -14,6 +14,7 @@ class AreaScanningBehaviour(Navigator):
     def __init__(self):
         super(AreaScanningBehaviour, self).__init__(enable_tacking=True,
                                                         enable_cross_track_minimization=False)
+        points.append(points[2])
         self.start_crossed = False
         self.enter_time = None
         self.current_point = 3
@@ -37,7 +38,7 @@ class AreaScanningBehaviour(Navigator):
                 self.enter_time = time.time()
                 return points[3]
             else:
-                return (points[0]+points[1]) / 2
+                return None
                 
         if self.start_crossed is True and time.time() >= self.enter_time + (MAX_BOX_TIME - TIME_TO_LEAVE):
             return points[2]
