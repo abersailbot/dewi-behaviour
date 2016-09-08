@@ -13,8 +13,9 @@ TIME_TO_LEAVE = 10
 class AreaScanningBehaviour(Navigator):
     def __init__(self):
         super(AreaScanningBehaviour, self).__init__(enable_tacking=True,
-                                                        enable_cross_track_minimization=False)
+                                                    enable_cross_track_minimization=True)
         points.append(points[2])
+
         self.start_crossed = False
         self.enter_time = None
         self.current_point = 3
@@ -53,7 +54,7 @@ class AreaScanningBehaviour(Navigator):
                     print 'distance to point', distance
                     return None
 
-                
+
 if __name__ == '__main__':
     behaviour = AreaScanningBehaviour()
     behaviour.run()
