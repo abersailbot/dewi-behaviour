@@ -26,7 +26,7 @@ class Navigator(object):
     def __init__(self,
                  enable_tacking=True,
                  enable_cross_track_minimization=True,
-                 enable_emergency_maneuver=True):
+                 enable_emergency_maneuver=False):
         self.enable_tacking = enable_tacking
         self.enable_cross_track_minimization = enable_cross_track_minimization
         self.enable_emergency_maneuver = enable_emergency_maneuver
