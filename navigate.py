@@ -137,7 +137,7 @@ class Navigator(object):
 
         # FIXME check if both values are of the correct sign with respect to
         # eachother
-        error = current_heading.delta(target_heading) + self.cross_track_error
+        error = current_heading.delta(target_heading) - self.cross_track_error
         self.integrator += error
         if self.integrator > self.integrator_max:
             self.integrator = self.integrator_max
