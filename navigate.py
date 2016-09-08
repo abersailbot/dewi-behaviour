@@ -157,7 +157,7 @@ class Navigator(object):
             if abs(rudder_angle) < self.hardover_rudder_threshold:
                 self.last_time_rudder_not_maxed = time.time()
             elif time.time() - self.last_time_rudder_not_maxed > self.hardover_rudder_timeout:
-                override_rudder()
+                self.override_rudder()
 
         print('heading:', current_heading, '	wanted:', target_heading, '	error:',
               error, '	integrator:', self.integrator, '	target:', self.target, '	rudder_angle:', rudder_angle)
