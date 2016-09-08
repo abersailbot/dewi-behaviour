@@ -17,6 +17,7 @@ class AreaScanningBehaviour(Navigator):
         super(AreaScanningBehaviour, self).__init__(enable_tacking=True,
                                                     enable_cross_track_minimization=True)
         points.append(points[2])
+        points.append(points[3])
 
         self.start_crossed = False
         self.enter_time = None
