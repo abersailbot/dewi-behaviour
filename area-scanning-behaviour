@@ -9,14 +9,13 @@ from navigate import Navigator
 #first two points must be the start line, next point must be the 
 #point for the finish line
 points = boatdclient.get_current_waypoints()
-MAX_BOX_TIME = 1
-TIME_TO_LEAVE = 0.5
+MAX_BOX_TIME = 30
+TIME_TO_LEAVE = 10
 
 class AreaScanningBehaviour(Navigator):
     def __init__(self):
         super(AreaScanningBehaviour, self).__init__(enable_tacking=True,
                                                     enable_cross_track_minimization=True)
-        # input points should be:
         points.append(points[2])
         points.append(points[3])
 
@@ -27,7 +26,7 @@ class AreaScanningBehaviour(Navigator):
         # start point should be the fouth waypoints, but the waypoint number is
         # incremented before target is set
         self.current_point = 3
-        self.waypoint_checkoff_distance = 4
+        self.waypoint_checkoff_distance = 7
         
         self.set_target((points[0]+points[1]) / 2)
                 
@@ -51,7 +50,6 @@ class AreaScanningBehaviour(Navigator):
                 return None
                 
         need_to_time_out = time.time() >= self.enter_time + (MAX_BOX_TIME - TIME_TO_LEAVE) * 60
-        print(self.have_timed_out)
         if self.start_crossed is True and need_to_time_out and not self.have_timed_out:
             self.have_timed_out = True
             self.current_point = len(points) - 2

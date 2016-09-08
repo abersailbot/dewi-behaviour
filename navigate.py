@@ -90,7 +90,6 @@ class Navigator(object):
             if isinstance(self.prev_target, boatdclient.Point) and isinstance(self.target, boatdclient.Point):
                 # TODO find ideal constant to properly scale up/down effects of cross track error
                 self.cross_track_error = self.boat.position.cross_track_distance(self.prev_target, self.target) * 5
-                print('cross_track_error:', self.cross_track_error)
             else:
                 self.cross_track_error = 0
 
