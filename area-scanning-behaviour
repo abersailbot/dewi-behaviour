@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import time
+
 import boatdclient
 
 from navigate import Navigator
@@ -19,7 +21,7 @@ class AreaScanningBehaviour(Navigator):
         self.start_crossed = False
         self.enter_time = None
         self.current_point = 3
-        self.waypoint_checkoff_distance = 8
+        self.waypoint_checkoff_distance = 7
         
         self.set_target((points[0]+points[1]) / 2)
                 
@@ -29,6 +31,7 @@ class AreaScanningBehaviour(Navigator):
             self.start_negative = False
 
     def check_new_target(self):    
+        print 'current_target:', self.current_point
         if self.start_crossed is False:             
             if  (self.boat.position.cross_track_distance(points[1], points[0]) <= 0 and \
                 self.start_negative is False) or (self.boat.position.cross_track_distance(points[1], \
@@ -41,18 +44,18 @@ class AreaScanningBehaviour(Navigator):
             else:
                 return None
                 
-        if self.start_crossed is True and time.time() >= self.enter_time + (MAX_BOX_TIME - TIME_TO_LEAVE):
+        if self.start_crossed is True and time.time() >= self.enter_time + (MAX_BOX_TIME - TIME_TO_LEAVE) * 60:
             return points[2]
             
+        else:
+            distance = self.boat.position.distance_to(self.target)
+            if distance <= self.waypoint_checkoff_distance:
+                print 'distance from point:', distance
+                self.current_point += 1
+                return points[self.current_point]
             else:
-                distance = self.boat.position.distance_to(self.target)
-                if distance <= self.waypoint_checkoff_distance:
-                    print 'distance from point:', distance
-                    self.current_point += 1
-                    return points[self.current_point]
-                else:
-                    print 'distance to point', distance
-                    return None
+                print 'distance to point', distance
+                return None
 
 
 if __name__ == '__main__':
