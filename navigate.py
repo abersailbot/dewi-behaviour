@@ -31,7 +31,7 @@ class Navigator(object):
         self.enable_cross_track_minimization = enable_cross_track_minimization
         self.enable_emergency_maneuver = enable_emergency_maneuver
 
-        self.boat = boatdclient.Boat()
+        self.boat = boatdclient.Boat(auto_update=False)
 
         self.target = None
         self.prev_target = None
@@ -216,6 +216,8 @@ class Navigator(object):
         '''
         while True:
             time1 = time.time()
+
+            self.boat.update()
             target = self.check_new_target()
             if target is not None:
                 self.prev_target = self.target
@@ -226,7 +228,8 @@ class Navigator(object):
             # FIXME: remove this timing information after
             # https://github.com/boatd/boatd/issues/68 is somewhat completed
             time2 = time.time()
-            print('loop took {}'.format(time2-time1))
+            with open('timing', 'a') as f:
+                f.write('{}\n'.format(time2-time1))
 
     @abstractmethod
     def check_new_target(self):
