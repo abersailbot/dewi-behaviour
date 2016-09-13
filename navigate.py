@@ -215,12 +215,18 @@ class Navigator(object):
         Run the main loop for the behaviour.
         '''
         while True:
+            time1 = time.time()
             target = self.check_new_target()
             if target is not None:
                 self.prev_target = self.target
                 self.set_target(target)
 
             self.update()
+
+            # FIXME: remove this timing information after
+            # https://github.com/boatd/boatd/issues/68 is somewhat completed
+            time2 = time.time()
+            print('loop took {}'.format(time2-time1))
 
     @abstractmethod
     def check_new_target(self):
