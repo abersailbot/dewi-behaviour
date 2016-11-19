@@ -94,10 +94,10 @@ class Navigator(object):
                 self.cross_track_error = 0
 
         # tacking logic
-        if target_heading < self.boat.wind.direction + self.tacking_angle and \
-           target_heading > self.boat.wind.direction - self.tacking_angle and \
+        if target_heading < self.boat.wind.absolute + self.tacking_angle and \
+           target_heading > self.boat.wind.absolute - self.tacking_angle and \
            self.enable_tacking:
-            bearing_to_wind = self.boat.position.bearing_to(self.target) - self.boat.wind.direction
+            bearing_to_wind = self.boat.position.bearing_to(self.target) - self.boat.wind.absolute
 
             # choose the best initial tack, based on which side of the cone
             # we're on
@@ -115,12 +115,12 @@ class Navigator(object):
             # detect if the boat is outside cone
             if modulus_to_wind >= float(self.cone_angle):
                 if bearing_to_wind <= 180:
-                    target_heading = self.boat.wind.direction + \
+                    target_heading = self.boat.wind.absolute + \
                                      self.tacking_angle
                     self.tacking_right = True
                     self.tacking_left = False
                 if bearing_to_wind > 180:
-                    target_heading = self.boat.wind.direction - \
+                    target_heading = self.boat.wind.absolute - \
                                      self.tacking_angle
                     self.tacking_right = False
                     self.tacking_left = True
@@ -128,10 +128,10 @@ class Navigator(object):
             # else the boat is inside cone
             else:
                 if self.tacking_left is True:
-                    target_heading = self.boat.wind.direction - \
+                    target_heading = self.boat.wind.absolute - \
                                      self.tacking_angle
                 if self.tacking_right is True:
-                    target_heading = self.boat.wind.direction + \
+                    target_heading = self.boat.wind.absolute + \
                                      self.tacking_angle
         else:
             self.tacking_left = None
@@ -177,7 +177,7 @@ class Navigator(object):
         # not really sure why this 180 needs to exist, but it's a quick bodge
         # to make it work. This should probably be fixed elsewhere at a later
         # date. I suspect boatd/python-boatd has some problems somewhere.
-        relative_wind_direction = self.boat.wind.relative_direction + 180
+        apparent_wind = self.boat.wind.apparent + 180
 
         sail_angle_close_hauled = 0
         sail_angle_close_reach  = 10
@@ -185,25 +185,25 @@ class Navigator(object):
         sail_angle_broad_reach  = 45
         sail_angle_running      = 90
 
-        if relative_wind_direction < 180:
-            if relative_wind_direction < 45:
+        if apparent_wind < 180:
+            if apparent_wind < 45:
                 sail_angle = sail_angle_close_hauled
-            elif relative_wind_direction < 68:
+            elif apparent_wind < 68:
                 sail_angle = sail_angle_close_reach
-            elif relative_wind_direction < 90:
+            elif apparent_wind < 90:
                 sail_angle = sail_angle_beam_reach
-            elif relative_wind_direction < 113:
+            elif apparent_wind < 113:
                 sail_angle = sail_angle_broad_reach
             else:
                 sail_angle = sail_angle_running
         else:
-            if relative_wind_direction >= 315:
+            if apparent_wind >= 315:
                 sail_angle = sail_angle_close_hauled
-            elif relative_wind_direction >= 292:
+            elif apparent_wind >= 292:
                 sail_angle = sail_angle_close_reach
-            elif relative_wind_direction >= 269:
+            elif apparent_wind >= 269:
                 sail_angle = sail_angle_beam_reach
-            elif relative_wind_direction >= 246:
+            elif apparent_wind >= 246:
                 sail_angle = sail_angle_broad_reach
             else:
                 sail_angle = sail_angle_running
