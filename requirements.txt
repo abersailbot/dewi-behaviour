@@ -1,1 +1,1 @@
-python-boatdclient>=0.4.0
+python-boatdclient>=0.8.0
