@@ -1,10 +1,12 @@
 from __future__ import print_function
 from abc import ABCMeta, abstractmethod
-import time
+import curses
 import math
+import time
 
 import boatdclient
 from boatdclient import Bearing
+
 
 def mirror_angle(angle):
     angle = float(angle)
@@ -12,6 +14,16 @@ def mirror_angle(angle):
         return 180 - (angle % 180)
     else:
         return angle
+
+
+def draw_fields(screen, fields, offset=0):
+    line_length = max([len(l[0]) for l in fields]) + 2
+
+    for i, (label, value) in enumerate(fields):
+        padding = ' ' * (line_length - len(label))
+        screen.addstr(i + offset, 2, '{}:{}'.format(label, padding))
+        screen.addstr('{}'.format(value), curses.A_BOLD)
+
 
 class Navigator(object):
     '''
@@ -26,10 +38,12 @@ class Navigator(object):
     def __init__(self,
                  enable_tacking=True,
                  enable_cross_track_minimization=True,
-                 enable_emergency_maneuver=True):
+                 enable_emergency_maneuver=True,
+		 enable_ui=True):
         self.enable_tacking = enable_tacking
         self.enable_cross_track_minimization = enable_cross_track_minimization
         self.enable_emergency_maneuver = enable_emergency_maneuver
+        self.enable_ui = enable_ui
 
         self.boat = boatdclient.Boat(auto_update=False)
 
@@ -58,8 +72,14 @@ class Navigator(object):
 
         self.cross_track_error = 0
 
+        if self.enable_ui:
+            curses.initscr()
+            curses.halfdelay(1)
+            curses.curs_set(0)
+
+
     def override_rudder(self, rudder_angle):
-        print('override_rudder ing')
+        #print('override_rudder ing')
         timeout = time.time() + 10
         initial_heading = self.boat.heading
 
@@ -67,7 +87,7 @@ class Navigator(object):
         self.boat.set_rudder(rudder_angle)
         while time.time() < timeout and \
                 abs(initial_heading.delta(self.boat.heading)) < 170:
-            print('override_rudder ong', timeout - time.time())
+            #print('override_rudder ong', timeout - time.time())
             time.sleep(0.1)
 
     def set_target(self, value):
@@ -156,20 +176,51 @@ class Navigator(object):
         # emergency procedure to get the boat to turn the opposite direction
         # when stuck trying to turn towards a target heading
         if self.enable_emergency_maneuver:
-            print('rudder_angle:', rudder_angle, 'hardover_rudder_timeout:', self.hardover_rudder_timeout)
+            #print('rudder_angle:', rudder_angle, 'hardover_rudder_timeout:', self.hardover_rudder_timeout)
             if abs(rudder_angle) < self.hardover_rudder_threshold:
                 self.last_time_rudder_not_maxed = time.time()
             elif time.time() - self.last_time_rudder_not_maxed > self.hardover_rudder_timeout:
-                print('time.time(), self.last_time_rudder_not_maxed', time.time(), self.last_time_rudder_not_maxed)
+                #print('time.time(), self.last_time_rudder_not_maxed', time.time(), self.last_time_rudder_not_maxed)
                 self.override_rudder(rudder_angle)
 
                 # allow 60 seconds to recover from the maneuver
                 self.last_time_rudder_not_maxed = time.time() + 60
 
-        print('heading:', current_heading, '	wanted:', target_heading, '	error:',
-              error, '	integrator:', self.integrator, '	target:', self.target, '	rudder_angle:', rudder_angle)
+        #print('heading:', current_heading, '	wanted:', target_heading, '	error:',
+        #      error, '	integrator:', self.integrator, '	target:', self.target, '	rudder_angle:', rudder_angle)
         self.boat.set_rudder(rudder_angle)
         self.update_sail()
+
+        distance = self.boat.position.distance_to(self.target)
+
+        if self.enable_ui:
+	    box = curses.newwin(7, 72, 1, 2)
+	    box.immedok(True)
+	    box.border()
+
+	    draw_fields(box,
+		(
+		    ('distance', distance),
+		    ('position', self.boat.position),
+		),
+		offset=1
+	    )
+
+	    draw_fields(self.stdscr,
+		(
+		    ('current_heading', current_heading,),
+		    ('target_heading', target_heading,),
+		),
+		offset=10
+	    )
+
+	    self.stdscr.refresh()
+	    try:
+		c = self.stdscr.getch()
+		if c == ord('q'):
+		    sys.exit()
+	    except Exception as e:
+		print(e)
 
     def update_sail(self):
         '''Set the sail to the correct angle based on current wind direction'''
@@ -210,10 +261,11 @@ class Navigator(object):
 
         self.boat.set_sail(sail_angle)
 
-    def run(self):
+    def _run(self, stdscr, _):
         '''
         Run the main loop for the behaviour.
         '''
+        self.stdscr = stdscr
         while True:
             time1 = time.time()
 
@@ -230,6 +282,12 @@ class Navigator(object):
             time2 = time.time()
             with open('timing', 'a') as f:
                 f.write('{}\n'.format(time2-time1))
+
+    def run(self):
+        '''
+        Run the main loop for the behaviour.
+        '''
+        curses.wrapper(self._run, [])
 
     @abstractmethod
     def check_new_target(self):
