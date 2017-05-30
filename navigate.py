@@ -6,12 +6,20 @@ import math
 import boatdclient
 from boatdclient import Bearing
 
+
 def mirror_angle(angle):
     angle = float(angle)
     if angle > 180:
         return 180 - (angle % 180)
     else:
         return angle
+
+
+def output(*args):
+    print('\033c\n')
+    for k, v in zip(args[::2], args[1::2]):
+        print('\t{}\t| {}'.format(k.ljust(20), v))
+
 
 class Navigator(object):
     '''
@@ -58,8 +66,9 @@ class Navigator(object):
 
         self.cross_track_error = 0
 
+        self.next_log_time = 0
+
     def override_rudder(self, rudder_angle):
-        print('override_rudder ing')
         timeout = time.time() + 10
         initial_heading = self.boat.heading
 
@@ -67,7 +76,6 @@ class Navigator(object):
         self.boat.set_rudder(rudder_angle)
         while time.time() < timeout and \
                 abs(initial_heading.delta(self.boat.heading)) < 170:
-            print('override_rudder ong', timeout - time.time())
             time.sleep(0.1)
 
     def set_target(self, value):
@@ -156,23 +164,43 @@ class Navigator(object):
         # emergency procedure to get the boat to turn the opposite direction
         # when stuck trying to turn towards a target heading
         if self.enable_emergency_maneuver:
-            print('rudder_angle:', rudder_angle, 'hardover_rudder_timeout:', self.hardover_rudder_timeout)
             if abs(rudder_angle) < self.hardover_rudder_threshold:
                 self.last_time_rudder_not_maxed = time.time()
             elif time.time() - self.last_time_rudder_not_maxed > self.hardover_rudder_timeout:
-                print('time.time(), self.last_time_rudder_not_maxed', time.time(), self.last_time_rudder_not_maxed)
                 self.override_rudder(rudder_angle)
 
                 # allow 60 seconds to recover from the maneuver
                 self.last_time_rudder_not_maxed = time.time() + 60
 
-        print('heading:', current_heading, '	wanted:', target_heading, '	error:',
-              error, '	integrator:', self.integrator, '	target:', self.target, '	rudder_angle:', rudder_angle)
-        self.boat.set_rudder(rudder_angle)
-        self.update_sail()
+        sail_angle = self.choose_sail_angle()
 
-    def update_sail(self):
-        '''Set the sail to the correct angle based on current wind direction'''
+        self.boat.set_rudder(rudder_angle)
+        self.boat.set_sail(sail_angle)
+
+        # output some debug information
+        if self.next_log_time <= time.time():
+            self.next_log_time = time.time() + 1
+            distance = self.boat.position.distance_to(self.target)
+            output(
+                'distance to point', distance,
+                'boat position', self.boat.position,
+                'target', self.target,
+                'heading', current_heading,
+                'desired heading', target_heading,
+                'heading error', error,
+                'heading integrator', self.integrator,
+                'rudder angle', rudder_angle,
+                'apparent wind', float(self.boat.wind.apparent),
+                'sail angle', sail_angle,
+                'tacking_left', self.tacking_left,
+                'tacking_right', self.tacking_right,
+            )
+
+    def choose_sail_angle(self):
+        '''
+        Return the correct angle to set the sail based on current wind
+        direction.
+        '''
 
         # not really sure why this 180 needs to exist, but it's a quick bodge
         # to make it work. This should probably be fixed elsewhere at a later
@@ -208,7 +236,7 @@ class Navigator(object):
             else:
                 sail_angle = sail_angle_running
 
-        self.boat.set_sail(sail_angle)
+        return sail_angle
 
     def run(self):
         '''
