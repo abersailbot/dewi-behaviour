@@ -97,7 +97,7 @@ class Navigator(object):
         if target_heading < self.boat.wind.absolute + self.tacking_angle and \
            target_heading > self.boat.wind.absolute - self.tacking_angle and \
            self.enable_tacking:
-            bearing_to_wind = self.boat.position.bearing_to(self.target) - self.boat.wind.absolute
+            bearing_to_wind = self.boat.position.bearing_to(self.target).delta(self.boat.wind.absolute)
 
             # choose the best initial tack, based on which side of the cone
             # we're on
