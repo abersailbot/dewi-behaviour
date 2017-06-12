@@ -51,8 +51,8 @@ class Navigator(object):
         # how far over the rudder can be before we assume it's hardover in and emergency
         self.hardover_rudder_threshold = 40
 
-        self.k_p = 0.6
-        self.k_i = 0.0
+        self.k_p = 0.5
+        self.k_i = 0.05
         self.integrator = 0
         self.integrator_max = 200
 
