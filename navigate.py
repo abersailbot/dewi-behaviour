@@ -15,6 +15,10 @@ def mirror_angle(angle):
         return angle
 
 
+def map_range(x, in_min, in_max, out_min, out_max):
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+
+
 def output(*args):
     print('\033c\n')
     for k, v in zip(args[::2], args[1::2]):
@@ -191,6 +195,7 @@ class Navigator(object):
                 'heading integrator', self.integrator,
                 'rudder angle', rudder_angle,
                 'apparent wind', float(self.boat.wind.apparent),
+                'absolute wind', float(self.boat.wind.absolute),
                 'sail angle', sail_angle,
                 'tacking_left', self.tacking_left,
                 'tacking_right', self.tacking_right,
@@ -202,41 +207,29 @@ class Navigator(object):
         direction.
         '''
 
-        # not really sure why this 180 needs to exist, but it's a quick bodge
-        # to make it work. This should probably be fixed elsewhere at a later
-        # date. I suspect boatd/python-boatd has some problems somewhere.
-        apparent_wind = self.boat.wind.apparent + 180
+        apparent_wind = float(self.boat.wind.apparent + 180)
 
-        sail_angle_close_hauled = 0
-        sail_angle_close_reach  = 10
-        sail_angle_beam_reach   = 20
-        sail_angle_broad_reach  = 45
-        sail_angle_running      = 90
-
-        if apparent_wind < 180:
-            if apparent_wind < 45:
-                sail_angle = sail_angle_close_hauled
-            elif apparent_wind < 68:
-                sail_angle = sail_angle_close_reach
-            elif apparent_wind < 90:
-                sail_angle = sail_angle_beam_reach
-            elif apparent_wind < 113:
-                sail_angle = sail_angle_broad_reach
-            else:
-                sail_angle = sail_angle_running
+        if apparent_wind > 180:
+            semicircle_wind = 360 - apparent_wind
         else:
-            if apparent_wind >= 315:
-                sail_angle = sail_angle_close_hauled
-            elif apparent_wind >= 292:
-                sail_angle = sail_angle_close_reach
-            elif apparent_wind >= 269:
-                sail_angle = sail_angle_beam_reach
-            elif apparent_wind >= 246:
-                sail_angle = sail_angle_broad_reach
-            else:
-                sail_angle = sail_angle_running
+            semicircle_wind = apparent_wind
 
-        return sail_angle
+        # linear offset for sail angle output
+        sail_offset = 0
+
+        # maximum and minimum output angles for sail
+        min_sail_angle = 1
+        max_sail_angle = 50
+
+        if semicircle_wind < 45:
+            semicircle_wind = 45
+        elif semicircle_wind > 135:
+            semicircle_wind = 135
+
+        sail_angle = map_range(semicircle_wind, 45, 135,
+                               min_sail_angle, max_sail_angle) + sail_offset
+
+        return 50 - sail_angle
 
     def run(self):
         '''
