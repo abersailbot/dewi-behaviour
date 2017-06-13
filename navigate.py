@@ -148,13 +148,13 @@ class Navigator(object):
         # FIXME check if both values are of the correct sign with respect to
         # eachother
         error = current_heading.delta(target_heading) - self.cross_track_error
-        self.integrator += error
+        self.integrator += self.k_i * error
         if self.integrator > self.integrator_max:
             self.integrator = self.integrator_max
         elif self.integrator < -self.integrator_max:
             self.integrator = -self.integrator_max
 
-        rudder_angle = -(self.k_p * error + self.k_i * self.integrator)
+        rudder_angle = -(self.k_p * error + self.integrator)
 
         if rudder_angle > 180:
             rudder_angle = 180
