@@ -6,12 +6,24 @@ import math
 import boatdclient
 from boatdclient import Bearing
 
+
 def mirror_angle(angle):
     angle = float(angle)
     if angle > 180:
         return 180 - (angle % 180)
     else:
         return angle
+
+
+def map_range(x, in_min, in_max, out_min, out_max):
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+
+
+def output(*args):
+    print('\033c\n')
+    for k, v in zip(args[::2], args[1::2]):
+        print('\t{}\t| {}'.format(k.ljust(20), v))
+
 
 class Navigator(object):
     '''
@@ -45,8 +57,8 @@ class Navigator(object):
         
         self.recovering = False
 
-        self.k_p = 0.6
-        self.k_i = 0.0
+        self.k_p = 0.5
+        self.k_i = 0.05
         self.integrator = 0
         self.integrator_max = 200
 
@@ -59,6 +71,8 @@ class Navigator(object):
         self.tacking_angle = Bearing(45)
 
         self.cross_track_error = 0
+
+        self.next_log_time = 0
 
     def override_rudder(self, rudder_angle):
         """
@@ -103,10 +117,10 @@ class Navigator(object):
                 self.cross_track_error = 0
 
         # tacking logic
-        if target_heading < self.boat.wind.absolute + self.tacking_angle and \
-           target_heading > self.boat.wind.absolute - self.tacking_angle and \
-           self.enable_tacking:
-            bearing_to_wind = self.boat.position.bearing_to(self.target) - self.boat.wind.absolute
+        if abs(target_heading.delta(self.boat.wind.absolute)) <=\
+           self.tacking_angle and self.enable_tacking:
+            bearing_to_wind = self.boat.position.bearing_to(self.target) -\
+                              self.boat.wind.absolute
 
             # choose the best initial tack, based on which side of the cone
             # we're on
@@ -149,13 +163,13 @@ class Navigator(object):
         # FIXME check if both values are of the correct sign with respect to
         # eachother
         error = current_heading.delta(target_heading) - self.cross_track_error
-        self.integrator += error
+        self.integrator += self.k_i * error
         if self.integrator > self.integrator_max:
             self.integrator = self.integrator_max
         elif self.integrator < -self.integrator_max:
             self.integrator = -self.integrator_max
 
-        rudder_angle = -(self.k_p * error + self.k_i * self.integrator)
+        rudder_angle = -(self.k_p * error + self.integrator)
 
         if rudder_angle > 180:
             rudder_angle = 180
@@ -172,7 +186,6 @@ class Navigator(object):
             elif abs(rudder_angle) < self.hardover_rudder_threshold:
                 self.last_time_rudder_not_maxed = time.time()
             elif time.time() - self.last_time_rudder_not_maxed > self.hardover_rudder_timeout:
-                print('time.time(), self.last_time_rudder_not_maxed', time.time(), self.last_time_rudder_not_maxed)
                 self.override_rudder(rudder_angle)
 
                 # allow 60 seconds to recover from the maneuver #dont start counting timeout for 60 secs
@@ -180,49 +193,60 @@ class Navigator(object):
                 self.recovering = True
                 
 
-        print('heading:', current_heading, '	wanted:', target_heading, '	error:',
-              error, '	integrator:', self.integrator, '	target:', self.target, '	rudder_angle:', rudder_angle)
+        sail_angle = self.choose_sail_angle()
+
         self.boat.set_rudder(rudder_angle)
-        self.update_sail()
-
-    def update_sail(self):
-        '''Set the sail to the correct angle based on current wind direction'''
-
-        # not really sure why this 180 needs to exist, but it's a quick bodge
-        # to make it work. This should probably be fixed elsewhere at a later
-        # date. I suspect boatd/python-boatd has some problems somewhere.
-        apparent_wind = self.boat.wind.apparent + 180
-
-        sail_angle_close_hauled = 0
-        sail_angle_close_reach  = 10
-        sail_angle_beam_reach   = 20
-        sail_angle_broad_reach  = 45
-        sail_angle_running      = 90
-
-        if apparent_wind < 180:
-            if apparent_wind < 45:
-                sail_angle = sail_angle_close_hauled
-            elif apparent_wind < 68:
-                sail_angle = sail_angle_close_reach
-            elif apparent_wind < 90:
-                sail_angle = sail_angle_beam_reach
-            elif apparent_wind < 113:
-                sail_angle = sail_angle_broad_reach
-            else:
-                sail_angle = sail_angle_running
-        else:
-            if apparent_wind >= 315:
-                sail_angle = sail_angle_close_hauled
-            elif apparent_wind >= 292:
-                sail_angle = sail_angle_close_reach
-            elif apparent_wind >= 269:
-                sail_angle = sail_angle_beam_reach
-            elif apparent_wind >= 246:
-                sail_angle = sail_angle_broad_reach
-            else:
-                sail_angle = sail_angle_running
-
         self.boat.set_sail(sail_angle)
+
+        # output some debug information
+        if self.next_log_time <= time.time():
+            self.next_log_time = time.time() + 1
+            distance = self.boat.position.distance_to(self.target)
+            output(
+                'distance to point', distance,
+                'boat position', self.boat.position,
+                'target', self.target,
+                'heading', current_heading,
+                'desired heading', target_heading,
+                'heading error', error,
+                'heading integrator', self.integrator,
+                'rudder angle', rudder_angle,
+                'apparent wind', float(self.boat.wind.apparent),
+                'absolute wind', float(self.boat.wind.absolute),
+                'sail angle', sail_angle,
+                'tacking_left', self.tacking_left,
+                'tacking_right', self.tacking_right,
+            )
+
+    def choose_sail_angle(self):
+        '''
+        Return the correct angle to set the sail based on current wind
+        direction.
+        '''
+
+        apparent_wind = float(self.boat.wind.apparent + 180)
+
+        if apparent_wind > 180:
+            semicircle_wind = 360 - apparent_wind
+        else:
+            semicircle_wind = apparent_wind
+
+        # linear offset for sail angle output
+        sail_offset = 0
+
+        # maximum and minimum output angles for sail
+        min_sail_angle = 1
+        max_sail_angle = 50
+
+        if semicircle_wind < 45:
+            semicircle_wind = 45
+        elif semicircle_wind > 135:
+            semicircle_wind = 135
+
+        sail_angle = map_range(semicircle_wind, 45, 135,
+                               min_sail_angle, max_sail_angle) + sail_offset
+
+        return 50 - sail_angle
 
     def run(self):
         '''

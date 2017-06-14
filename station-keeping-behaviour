@@ -32,26 +32,34 @@ class StationKeepingBehaviour(Navigator):
             self.start_negative = False
 
     def check_new_target(self):
-        if self.boat.position.distance_to(self.center) < 1:
-            if self.center_reached is False:
+        # now inside box
+        if self.boat.position.distance_to(self.center) < 5: #account for this in timing?
+            if self.center_reached is False: # first time center reached
                 self.time_to_center = time.time() - self.enter_time
             self.center_reached = True
 
-        if self.center_reached is False:             
-            if  (self.boat.position.cross_track_distance(self.nearest_line_points[1], self.nearest_line_points[0]) <= 0 and \
-                self.start_negative is False) or (self.boat.position.cross_track_distance(self.nearest_line_points[1], \
-                self.nearest_line_points[0]) >= 0 and self.start_negative is True):
-                      
+        # still outside box
+        if self.center_reached is False:        
+        
+            distance_to_edge = self.boat.position.cross_track_distance(\
+                               self.nearest_line_points[1], self.nearest_line_points[0])
+            # if now in box
+            if (distance_to_edge <= 0 and self.start_negative is False)\
+             or (distance_to_edge >= 0 and self.start_negative is True):
+             
                 print 'YOU HAVE CROSSED THE LINE ' * 20
                 self.line_crossed = True
                 self.enter_time = time.time()
                 self.bearing_edge_to_center = self.boat.position.bearing_to(self.center)
 
             return None
-
+        
+        # while in box
         elif self.center_reached is True:
+            # wait for time
             if time.time() < self.enter_time + (minutes_in_box * 60) - self.time_to_center:
                 return None
+            # leave box
             else:
                 return self.bearing_edge_to_center
 

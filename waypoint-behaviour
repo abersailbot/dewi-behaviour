@@ -18,11 +18,9 @@ class TestBehaviour(Navigator):
     def check_new_target(self):
         distance = self.boat.position.distance_to(self.target)
         if distance <= self.waypoint_checkoff_distance:
-            print 'distance from point:', distance
             self.current_point += 1
             return points[self.current_point]
         else:
-            print 'distance to point', distance
             return None
 
 if __name__ == '__main__':
