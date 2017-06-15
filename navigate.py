@@ -66,7 +66,7 @@ class Navigator(object):
 
         self.tacking_left = None
         self.tacking_right = None
-        self.cone_angle = Bearing(15)
+        self.cone_angle = Bearing(20)
         self.tacking_angle = Bearing(45)
 
         # maximum rudder angle on either side
