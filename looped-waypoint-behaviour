@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+
+import boatdclient
+
+from navigate import Navigator
+
+points = boatdclient.get_current_waypoints()
+
+
+class LoopedBehaviour(Navigator):
+    def __init__(self):
+        super(LoopedBehaviour, self).__init__()
+        self.set_target(points[0])
+        self.current_point = 0
+
+        self.waypoint_checkoff_distance = 9
+
+    def check_new_target(self):
+        distance = self.boat.position.distance_to(self.target)
+        if distance <= self.waypoint_checkoff_distance:
+            self.current_point += 1
+            return points[self.current_point % len(points)]
+        else:
+            return None
+
+if __name__ == '__main__':
+    behaviour = LoopedBehaviour()
+    behaviour.run()
