@@ -195,17 +195,21 @@ class Navigator(object):
             self.next_log_time = time.time() + 1
             distance = self.boat.position.distance_to(self.target)
             output(
-                'distance to point', distance,
+                'distance to point', '{:.1f}'.format(distance),
+                'current_point', getattr(self, 'current_point'),
                 'boat position', self.boat.position,
                 'target', self.target,
+                '', '',
                 'heading', current_heading,
                 'desired heading', target_heading,
-                'heading error', error,
-                'heading integrator', self.integrator,
-                'rudder angle', rudder_angle,
-                'apparent wind', float(self.boat.wind.apparent),
-                'absolute wind', float(self.boat.wind.absolute),
-                'sail angle', sail_angle,
+                'heading error', '{:.1f}'.format(error),
+                'heading integrator', '{:.1f}'.format(self.integrator),
+                'rudder angle', '{:.1f}'.format(rudder_angle),
+                '', '',
+                'apparent wind', '{:.1f}'.format(float(self.boat.wind.apparent)),
+                'absolute wind', '{:.1f}'.format(float(self.boat.wind.absolute)),
+                'sail angle', '{:.1f}'.format(sail_angle),
+                '', '',
                 'tacking_left', self.tacking_left,
                 'tacking_right', self.tacking_right,
             )
