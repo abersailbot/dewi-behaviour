@@ -55,10 +55,11 @@ class Navigator(object):
         # how far over the rudder can be before we assume it's hardover in and emergency
         self.hardover_rudder_threshold = 40
 
+        self.rudder_angle = 0
         self.k_p = 0.5
-        self.k_i = 0.05
+        self.k_i = 0.03
         self.integrator = 0
-        self.integrator_max = 200
+        self.integrator_max = 10000
 
         # tracks the last time the the rudder was in a good position (i.e. not hard over)
         self.last_time_rudder_not_maxed = time.time()
@@ -67,6 +68,9 @@ class Navigator(object):
         self.tacking_right = None
         self.cone_angle = Bearing(15)
         self.tacking_angle = Bearing(45)
+
+        # maximum rudder angle on either side
+        self.rudder_angle_max = 45
 
         self.cross_track_error = 0
 
@@ -152,18 +156,23 @@ class Navigator(object):
         # FIXME check if both values are of the correct sign with respect to
         # eachother
         error = current_heading.delta(target_heading) - self.cross_track_error
-        self.integrator += self.k_i * error
-        if self.integrator > self.integrator_max:
-            self.integrator = self.integrator_max
-        elif self.integrator < -self.integrator_max:
-            self.integrator = -self.integrator_max
 
-        rudder_angle = -(self.k_p * error + self.integrator)
+        # only integrate if the rudder is not at maximum position
+        if -self.rudder_angle_max < self.rudder_angle < self.rudder_angle_max:
+            self.integrator += self.k_i * error
+            if self.integrator > self.integrator_max:
+                self.integrator = self.integrator_max
+            elif self.integrator < -self.integrator_max:
+                self.integrator = -self.integrator_max
 
-        if rudder_angle > 180:
-            rudder_angle = 180
-        if rudder_angle < -180:
-            rudder_angle = -180
+        rudder_angle = -(self.k_p * error + self.k_i * self.integrator)
+
+        if rudder_angle > self.rudder_angle_max:
+            rudder_angle = self.rudder_angle_max
+        if rudder_angle < -self.rudder_angle_max:
+            rudder_angle = -self.rudder_angle_max
+
+        self.rudder_angle = rudder_angle
 
         # emergency procedure to get the boat to turn the opposite direction
         # when stuck trying to turn towards a target heading
