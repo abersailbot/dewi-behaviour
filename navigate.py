@@ -59,7 +59,7 @@ class Navigator(object):
         self.k_p = 0.5
         self.k_i = 0.03
         self.integrator = 0
-        self.integrator_max = 10000
+        self.integrator_max = 1000
 
         # tracks the last time the the rudder was in a good position (i.e. not hard over)
         self.last_time_rudder_not_maxed = time.time()
@@ -232,7 +232,7 @@ class Navigator(object):
 
         # maximum and minimum output angles for sail
         min_sail_angle = 1
-        max_sail_angle = 50
+        max_sail_angle = 70
 
         if semicircle_wind < 45:
             semicircle_wind = 45
@@ -242,7 +242,8 @@ class Navigator(object):
         sail_angle = map_range(semicircle_wind, 45, 135,
                                min_sail_angle, max_sail_angle) + sail_offset
 
-        return 50 - sail_angle
+        return sail_angle
+	#return sail_angle
 
     def run(self):
         '''
