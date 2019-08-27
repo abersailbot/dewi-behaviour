@@ -1,0 +1,76 @@
+#!/usr/bin/env python
+import numpy as np
+import argparse
+import cv2
+import random
+
+
+def find_red_blobs(image):
+    '''finds a big red blob and returns its centre coordinates'''
+ 
+    # create NumPy arrays from the boundaries
+    lower = np.array([0,0,130], dtype = "uint8")
+    upper = np.array([200,130,255], dtype = "uint8")
+ 
+    # find the colors within the specified boundaries
+    # boundaries are blue, green, red
+    mask = cv2.inRange(image, lower, upper)
+
+    # mask out around the identified parts of the image
+    output = cv2.bitwise_and(image, image, mask = mask)
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (4,4))
+    eroded = cv2.erode(output, kernel, iterations = 1)
+
+    #show the eroded image     
+    #cv2.imshow("Eroded",eroded)
+    #cv2.waitKey(0)
+
+
+    #threshold the image
+    gray = cv2.cvtColor(eroded, cv2.COLOR_BGR2GRAY)
+    ret,thresh1 = cv2.threshold(gray,70,255,cv2.THRESH_BINARY)
+
+    #show the thresholded image    
+    #cv2.imshow("Thresholded",thresh1)
+    #cv2.waitKey(0)
+
+
+    #get the contours of what ever is left in the image
+    #opencv3 version
+    #contour_im, contours, hierarchy = cv2.findContours(thresh1, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    #opencv2 version
+    contours, hierarchy = cv2.findContours(thresh1, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    #find the largest contour
+    largest_area = 0
+    largest_area_index = 0
+    for i in range(len(contours)):
+        area = cv2.contourArea(contours[i])
+        if area > largest_area:
+            largest_area = area
+            largest_area_index = i
+
+    print("largest contour is ",largest_area_index,largest_area)
+
+    #draw a circle around it
+    (x,y),radius = cv2.minEnclosingCircle(contours[largest_area_index])
+    center = (int(x),int(y))
+    radius = int(radius)
+
+    #show the circle
+    cv2.circle(image,center,radius,(0,255,0),2)
+    cv2.imshow('Circles', image)
+    cv2.waitKey(0)
+    
+    return int(x),int(y)
+
+
+# construct the argument parse and parse the arguments
+ap = argparse.ArgumentParser()
+ap.add_argument("-i", "--image", help = "path to the image")
+args = vars(ap.parse_args())
+ 
+# load the image
+image = cv2.imread(args["image"])
+print(find_red_blobs(image))
