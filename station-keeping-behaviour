@@ -55,7 +55,7 @@ class StationKeepingBehaviour(Navigator):
             if (distance_to_edge <= 0 and self.start_negative is False)\
              or (distance_to_edge >= 0 and self.start_negative is True):
              
-                print 'YOU HAVE CROSSED THE LINE ' * 20
+                print ('YOU HAVE CROSSED THE LINE ' * 20)
                 self.line_crossed = True
                 self.enter_time = time.time()
                 self.bearing_edge_to_center = self.boat.position.bearing_to(self.center)
