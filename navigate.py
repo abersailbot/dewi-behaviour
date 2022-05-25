@@ -54,6 +54,8 @@ class Navigator(object):
 
         # how far over the rudder can be before we assume it's hardover in and emergency
         self.hardover_rudder_threshold = 40
+        
+        self.recovering = False
 
         self.rudder_angle = 0
         self.k_p = 0.5
@@ -77,14 +79,23 @@ class Navigator(object):
         self.next_log_time = 0
 
     def override_rudder(self, rudder_angle):
+        """
+        Move rudder to oposite hard over to jybe when tacking has not worked.
+        Must move through 170 degrees before returning to normal, or for a
+        maximum of 10 seconds 
+        """
+        print('override_rudder ing')
         timeout = time.time() + 10
         initial_heading = self.boat.heading
 
-        rudder_angle = -45 if rudder_angle > 0 else 45
+        rudder_angle = -45 if rudder_angle > 0 else 45  #desired angle is rudder_angle
         self.boat.set_rudder(rudder_angle)
-        while time.time() < timeout and \
-                abs(initial_heading.delta(self.boat.heading)) < 170:
-            time.sleep(0.1)
+        while abs(initial_heading.delta(self.boat.heading)) < 170:
+            if time.time() > timeout:
+                break
+            else:
+                print('override_rudder ing', timeout - time.time())
+                time.sleep(0.1)
 
     def set_target(self, value):
         '''Set the target angle for the boat.'''
@@ -177,13 +188,19 @@ class Navigator(object):
         # emergency procedure to get the boat to turn the opposite direction
         # when stuck trying to turn towards a target heading
         if self.enable_emergency_maneuver:
-            if abs(rudder_angle) < self.hardover_rudder_threshold:
+            print('rudder_angle:', rudder_angle, 'hardover_rudder_timeout:', self.hardover_rudder_timeout)
+            if self.recovering is True:
+                if time.time() > last_time_rudder_not_maxed:
+                    self.recovering = False
+            elif abs(rudder_angle) < self.hardover_rudder_threshold:
                 self.last_time_rudder_not_maxed = time.time()
             elif time.time() - self.last_time_rudder_not_maxed > self.hardover_rudder_timeout:
                 self.override_rudder(rudder_angle)
 
-                # allow 60 seconds to recover from the maneuver
-                self.last_time_rudder_not_maxed = time.time() + 60
+                # allow 60 seconds to recover from the maneuver #dont start counting timeout for 60 secs
+                self.last_time_rudder_not_maxed = time.time() + 60 
+                self.recovering = True
+                
 
         sail_angle = self.choose_sail_angle()
 
