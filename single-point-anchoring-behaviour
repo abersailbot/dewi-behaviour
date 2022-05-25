@@ -16,7 +16,7 @@ class VirtualAnchoringBehaviour(Navigator):
     def check_new_target(self):
         distance = self.boat.position.distance_to(self.target)
 
-        print 'distance from point:', distance
+        print ('distance from point:', distance)
         return points[0]
 
 
